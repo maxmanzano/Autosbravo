@@ -1,0 +1,14 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Protege el panel de administrador con Netlify Identity
+[[redirects]]
+  from = "/admin.html"
+  to = "/admin.html"
+  status = 200

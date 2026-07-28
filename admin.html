@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Panel de Administración — Catálogo de Autos</title>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<style>
+  :root {
+    --primario: #1a3c6e;
+    --acento: #ff6b35;
+    --fondo: #f4f6f9;
+    --texto: #1f2937;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--fondo);
+    color: var(--texto);
+    margin: 0;
+  }
+  header {
+    background: var(--primario);
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header h1 { font-size: 1.2rem; margin: 0; }
+  #login-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 70vh;
+    gap: 1rem;
+  }
+  button {
+    background: var(--acento);
+    color: white;
+    border: none;
+    padding: 0.7rem 1.4rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+  button.secundario {
+    background: transparent;
+    color: var(--primario);
+    border: 1px solid var(--primario);
+  }
+  main { padding: 2rem; max-width: 1000px; margin: 0 auto; }
+  .panel {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    margin-bottom: 2rem;
+  }
+  .grid-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  .grid-form label { display: flex; flex-direction: column; font-size: 0.85rem; gap: 0.3rem; }
+  input, textarea {
+    padding: 0.6rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.95rem;
+  }
+  .full { grid-column: 1 / -1; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+  th, td { text-align: left; padding: 0.6rem; border-bottom: 1px solid #e5e7eb; font-size: 0.9rem; }
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  .acciones button { margin-right: 0.4rem; padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+  #status-msg { font-size: 0.9rem; margin-top: 0.5rem; }
+  .oculto { display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🚗 Panel de Administración — Catálogo de Autos</h1>
+  <div id="user-info" class="oculto">
+    <button class="secundario" onclick="netlifyIdentity.logout()">Cerrar sesión</button>
+  </div>
+</header>
+
+<div id="login-screen">
+  <p>Necesitas iniciar sesión para administrar el catálogo.</p>
+  <button onclick="netlifyIdentity.open()">Iniciar sesión</button>
+</div>
+
+<main id="admin-content" class="oculto">
+
+  <div class="panel">
+    <h2 id="form-titulo">Agregar nuevo auto</h2>
+    <form id="form-auto" class="grid-form">
+      <input type="hidden" id="auto-id" />
+      <label>Marca
+        <input type="text" id="marca" required />
+      </label>
+      <label>Modelo
+        <input type="text" id="modelo" required />
+      </label>
+      <label>Año
+        <input type="number" id="anio" required />
+      </label>
+      <label>Precio (MXN)
+        <input type="number" id="precio" required />
+      </label>
+      <label>Kilometraje
+        <input type="number" id="kilometraje" />
+      </label>
+      <label>Color
+        <input type="text" id="color" />
+      </label>
+      <label class="full">Descripción
+        <textarea id="descripcion" rows="3"></textarea>
+      </label>
+      <label class="full">Foto (JPG/PNG)
+        <input type="file" id="foto" accept="image/*" />
+      </label>
+      <div class="full">
+        <button type="submit">Guardar auto</button>
+        <button type="button" class="secundario" onclick="resetForm()">Cancelar edición</button>
+      </div>
+    </form>
+    <p id="status-msg"></p>
+  </div>
+
+  <div class="panel">
+    <h2>Catálogo actual</h2>
+    <button class="secundario" onclick="cargarAutos()">🔄 Refrescar lista</button>
+    <table>
+      <thead>
+        <tr><th>Auto</th><th>Precio</th><th>Km</th><th>MercadoLibre</th><th>Acciones</th></tr>
+      </thead>
+      <tbody id="tabla-autos"></tbody>
+    </table>
+  </div>
+
+</main>
+
+<script>
+  let autosCache = [];
+
+  netlifyIdentity.on("init", (user) => {
+    mostrarSegunSesion(user);
+  });
+  netlifyIdentity.on("login", (user) => {
+    mostrarSegunSesion(user);
+    netlifyIdentity.close();
+  });
+  netlifyIdentity.on("logout", () => mostrarSegunSesion(null));
+  netlifyIdentity.init();
+
+  function mostrarSegunSesion(user) {
+    document.getElementById("login-screen").classList.toggle("oculto", !!user);
+    document.getElementById("admin-content").classList.toggle("oculto", !user);
+    document.getElementById("user-info").classList.toggle("oculto", !user);
+    if (user) cargarAutos();
+  }
+
+  function tokenActual() {
+    const user = netlifyIdentity.currentUser();
+    return user ? user.token.access_token : null;
+  }
+
+  async function cargarAutos() {
+    // El catálogo público (autos.json) se lee directo del repo publicado, sin auth.
+    const res = await fetch("/data/autos.json?_=" + Date.now());
+    autosCache = await res.json();
+    pintarTabla();
+  }
+
+  function pintarTabla() {
+    const tbody = document.getElementById("tabla-autos");
+    tbody.innerHTML = "";
+    autosCache.forEach((a) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${a.marca} ${a.modelo} ${a.anio}</td>
+        <td>$${Number(a.precio).toLocaleString("es-MX")}</td>
+        <td>${a.kilometraje || "-"}</td>
+        <td>${a.ml_item_id ? `<span class="badge">Publicado (${a.ml_item_id})</span>` : "—"}</td>
+        <td class="acciones">
+          <button onclick="editarAuto('${a.id}')">Editar</button>
+          <button onclick="eliminarAuto('${a.id}')">Eliminar</button>
+          <button onclick="publicarEnML('${a.id}')">Publicar en ML</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function editarAuto(id) {
+    const a = autosCache.find((x) => x.id === id);
+    if (!a) return;
+    document.getElementById("form-titulo").textContent = `Editando: ${a.marca} ${a.modelo}`;
+    document.getElementById("auto-id").value = a.id;
+    document.getElementById("marca").value = a.marca;
+    document.getElementById("modelo").value = a.modelo;
+    document.getElementById("anio").value = a.anio;
+    document.getElementById("precio").value = a.precio;
+    document.getElementById("kilometraje").value = a.kilometraje || "";
+    document.getElementById("color").value = a.color || "";
+    document.getElementById("descripcion").value = a.descripcion || "";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function resetForm() {
+    document.getElementById("form-titulo").textContent = "Agregar nuevo auto";
+    document.getElementById("form-auto").reset();
+    document.getElementById("auto-id").value = "";
+  }
+
+  function leerFotoComoBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(",")[1]); // sin el prefijo data:
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  document.getElementById("form-auto").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const statusMsg = document.getElementById("status-msg");
+    statusMsg.textContent = "Guardando...";
+
+    const fotoInput = document.getElementById("foto");
+    let photoBase64 = null;
+    let photoFilename = null;
+    if (fotoInput.files.length > 0) {
+      photoBase64 = await leerFotoComoBase64(fotoInput.files[0]);
+      photoFilename = fotoInput.files[0].name;
+    }
+
+    const auto = {
+      id: document.getElementById("auto-id").value || undefined,
+      marca: document.getElementById("marca").value,
+      modelo: document.getElementById("modelo").value,
+      anio: Number(document.getElementById("anio").value),
+      precio: Number(document.getElementById("precio").value),
+      kilometraje: Number(document.getElementById("kilometraje").value) || 0,
+      color: document.getElementById("color").value,
+      descripcion: document.getElementById("descripcion").value,
+    };
+
+    try {
+      const res = await fetch("/api/save-auto", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenActual()}`,
+        },
+        body: JSON.stringify({ auto, photoBase64, photoFilename }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error desconocido");
+
+      statusMsg.textContent = "✅ Guardado. El sitio se actualizará en 1-2 minutos.";
+      resetForm();
+      setTimeout(cargarAutos, 1500);
+    } catch (err) {
+      statusMsg.textContent = "❌ Error: " + err.message;
+    }
+  });
+
+  async function eliminarAuto(id) {
+    if (!confirm("¿Seguro que quieres eliminar este auto?")) return;
+    const res = await fetch("/api/delete-auto", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenActual()}`,
+      },
+      body: JSON.stringify({ id }),
+    });
+    const data = await res.json();
+    if (!res.ok) return alert("Error: " + data.error);
+    cargarAutos();
+  }
+
+  async function publicarEnML(id) {
+    const a = autosCache.find((x) => x.id === id);
+    if (!a) return;
+    if (!a.foto) return alert("Este auto no tiene foto todavía. Agrega una foto antes de publicar.");
+
+    // La foto ya publicada en tu sitio (GitHub Pages/Netlify) tiene una URL pública real
+    const fotoUrlPublica = `${window.location.origin}/${a.foto}`;
+
+    const statusMsg = document.getElementById("status-msg");
+    statusMsg.textContent = "Publicando en MercadoLibre...";
+
+    try {
+      const res = await fetch("/api/publish-mercadolibre", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenActual()}`,
+        },
+        body: JSON.stringify({ auto: { ...a, foto_url_publica: fotoUrlPublica } }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(JSON.stringify(data.error));
+
+      // Guardamos el ml_item_id en el auto para futuras actualizaciones
+      await fetch("/api/save-auto", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenActual()}`,
+        },
+        body: JSON.stringify({ auto: { ...a, id, ml_item_id: data.ml_item_id } }),
+      });
+
+      statusMsg.textContent = `✅ Publicado en MercadoLibre: ${data.ml_permalink}`;
+      setTimeout(cargarAutos, 1500);
+    } catch (err) {
+      statusMsg.textContent = "❌ Error publicando en ML: " + err.message;
+    }
+  }
+</script>
+
+</body>
+</html>
