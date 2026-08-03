@@ -83,6 +83,21 @@
   .acciones button { margin-right: 0.4rem; padding: 0.4rem 0.8rem; font-size: 0.8rem; }
   #status-msg { font-size: 0.9rem; margin-top: 0.5rem; }
   .oculto { display: none; }
+  .thumb {
+    position: relative;
+    width: 84px; height: 84px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #d1d5db;
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb button {
+    position: absolute; top: 2px; right: 2px;
+    background: rgba(0,0,0,0.65); color: white;
+    border: none; border-radius: 50%;
+    width: 20px; height: 20px; line-height: 1;
+    font-size: 12px; padding: 0; cursor: pointer;
+  }
 </style>
 </head>
 <body>
@@ -126,9 +141,17 @@
       <label class="full">Descripción
         <textarea id="descripcion" rows="3"></textarea>
       </label>
-      <label class="full">Foto (JPG/PNG)
-        <input type="file" id="foto" accept="image/*" />
+      <label class="full">Fotos (JPG/PNG) — puedes seleccionar varias a la vez
+        <input type="file" id="foto" accept="image/*" multiple />
       </label>
+      <div class="full" id="fotos-existentes-wrap" style="display:none;">
+        <p style="font-size:.85rem;color:#6B6A68;margin:.4rem 0 .3rem;">Fotos ya guardadas (clic en ✕ para quitar una):</p>
+        <div id="fotos-existentes" style="display:flex;flex-wrap:wrap;gap:.6rem;"></div>
+      </div>
+      <div class="full" id="fotos-nuevas-wrap" style="display:none;">
+        <p style="font-size:.85rem;color:#6B6A68;margin:.4rem 0 .3rem;">Fotos nuevas a subir:</p>
+        <div id="fotos-nuevas-preview" style="display:flex;flex-wrap:wrap;gap:.6rem;"></div>
+      </div>
       <div class="full">
         <button type="submit">Guardar auto</button>
         <button type="button" class="secundario" onclick="resetForm()">Cancelar edición</button>
@@ -152,6 +175,8 @@
 
 <script>
   let autosCache = [];
+  let fotosExistentesActuales = []; // rutas (strings) del auto que se está editando
+  let fotosNuevasSeleccionadas = []; // Files elegidos en esta sesión de edición
 
   netlifyIdentity.on("init", (user) => {
     mostrarSegunSesion(user);
@@ -189,9 +214,10 @@
     const tbody = document.getElementById("tabla-autos");
     tbody.innerHTML = "";
     autosCache.forEach((a) => {
+      const numFotos = (a.fotos && a.fotos.length) || (a.foto ? 1 : 0);
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${a.marca} ${a.modelo} ${a.anio}</td>
+        <td>${a.marca} ${a.modelo} ${a.anio} ${numFotos ? `<span class="badge">${numFotos} foto${numFotos === 1 ? "" : "s"}</span>` : ""}</td>
         <td>$${Number(a.precio).toLocaleString("es-MX")}</td>
         <td>${a.kilometraje || "-"}</td>
         <td>${a.ml_item_id ? `<span class="badge">Publicado (${a.ml_item_id})</span>` : "—"}</td>
@@ -205,6 +231,60 @@
     });
   }
 
+  function pintarFotosExistentes() {
+    const wrap = document.getElementById("fotos-existentes-wrap");
+    const cont = document.getElementById("fotos-existentes");
+    if (fotosExistentesActuales.length === 0) {
+      wrap.style.display = "none";
+      cont.innerHTML = "";
+      return;
+    }
+    wrap.style.display = "block";
+    cont.innerHTML = fotosExistentesActuales
+      .map(
+        (ruta, i) => `
+        <div class="thumb">
+          <img src="${ruta}" alt="Foto ${i + 1}" />
+          <button type="button" onclick="quitarFotoExistente(${i})" title="Quitar esta foto">✕</button>
+        </div>`
+      )
+      .join("");
+  }
+
+  function quitarFotoExistente(i) {
+    fotosExistentesActuales.splice(i, 1);
+    pintarFotosExistentes();
+  }
+
+  function pintarFotosNuevasPreview() {
+    const wrap = document.getElementById("fotos-nuevas-wrap");
+    const cont = document.getElementById("fotos-nuevas-preview");
+    if (fotosNuevasSeleccionadas.length === 0) {
+      wrap.style.display = "none";
+      cont.innerHTML = "";
+      return;
+    }
+    wrap.style.display = "block";
+    cont.innerHTML = "";
+    fotosNuevasSeleccionadas.forEach((file, i) => {
+      const url = URL.createObjectURL(file);
+      const div = document.createElement("div");
+      div.className = "thumb";
+      div.innerHTML = `<img src="${url}" alt="Nueva foto ${i + 1}" /><button type="button" title="Quitar">✕</button>`;
+      div.querySelector("button").addEventListener("click", () => {
+        fotosNuevasSeleccionadas.splice(i, 1);
+        pintarFotosNuevasPreview();
+      });
+      cont.appendChild(div);
+    });
+  }
+
+  document.getElementById("foto").addEventListener("change", (e) => {
+    fotosNuevasSeleccionadas = fotosNuevasSeleccionadas.concat(Array.from(e.target.files));
+    e.target.value = ""; // permite volver a elegir más fotos después sin perder las ya elegidas
+    pintarFotosNuevasPreview();
+  });
+
   function editarAuto(id) {
     const a = autosCache.find((x) => x.id === id);
     if (!a) return;
@@ -217,6 +297,12 @@
     document.getElementById("kilometraje").value = a.kilometraje || "";
     document.getElementById("color").value = a.color || "";
     document.getElementById("descripcion").value = a.descripcion || "";
+
+    fotosExistentesActuales = a.fotos && a.fotos.length ? [...a.fotos] : (a.foto ? [a.foto] : []);
+    fotosNuevasSeleccionadas = [];
+    pintarFotosExistentes();
+    pintarFotosNuevasPreview();
+
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -224,6 +310,10 @@
     document.getElementById("form-titulo").textContent = "Agregar nuevo auto";
     document.getElementById("form-auto").reset();
     document.getElementById("auto-id").value = "";
+    fotosExistentesActuales = [];
+    fotosNuevasSeleccionadas = [];
+    pintarFotosExistentes();
+    pintarFotosNuevasPreview();
   }
 
   function leerFotoComoBase64(file) {
@@ -240,12 +330,10 @@
     const statusMsg = document.getElementById("status-msg");
     statusMsg.textContent = "Guardando...";
 
-    const fotoInput = document.getElementById("foto");
-    let photoBase64 = null;
-    let photoFilename = null;
-    if (fotoInput.files.length > 0) {
-      photoBase64 = await leerFotoComoBase64(fotoInput.files[0]);
-      photoFilename = fotoInput.files[0].name;
+    const fotosNuevasBase64 = [];
+    for (const file of fotosNuevasSeleccionadas) {
+      const data = await leerFotoComoBase64(file);
+      fotosNuevasBase64.push({ data, filename: file.name });
     }
 
     const auto = {
@@ -257,6 +345,7 @@
       kilometraje: Number(document.getElementById("kilometraje").value) || 0,
       color: document.getElementById("color").value,
       descripcion: document.getElementById("descripcion").value,
+      fotos: fotosExistentesActuales,
     };
 
     try {
@@ -267,7 +356,7 @@
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ auto, photoBase64, photoFilename }),
+        body: JSON.stringify({ auto, photosNuevas: fotosNuevasBase64 }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error desconocido");
@@ -299,10 +388,11 @@
   async function publicarEnML(id) {
     const a = autosCache.find((x) => x.id === id);
     if (!a) return;
-    if (!a.foto) return alert("Este auto no tiene foto todavía. Agrega una foto antes de publicar.");
+    const primeraFoto = (a.fotos && a.fotos[0]) || a.foto;
+    if (!primeraFoto) return alert("Este auto no tiene fotos todavía. Agrega al menos una foto antes de publicar.");
 
     // La foto ya publicada en tu sitio (GitHub Pages/Netlify) tiene una URL pública real
-    const fotoUrlPublica = `${window.location.origin}/${a.foto}`;
+    const fotoUrlPublica = `${window.location.origin}/${primeraFoto}`;
 
     const statusMsg = document.getElementById("status-msg");
     statusMsg.textContent = "Publicando en MercadoLibre...";

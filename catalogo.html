@@ -107,16 +107,31 @@
   const fmtMXN = (n) => "$" + Number(n).toLocaleString("es-MX");
   let TODOS = [];
 
-  function tarjetaAuto(a) {
-    const foto = a.foto
-      ? `<img src="${a.foto}" alt="${a.marca} ${a.modelo}" loading="lazy" />`
+  function cambiarFotoPrincipal(event, cardId, nuevaSrc, miniaturaEl) {
+    event.stopPropagation();
+    event.preventDefault();
+    const main = document.getElementById(`${cardId}-main`);
+    if (main) main.src = nuevaSrc;
+    miniaturaEl.parentElement.querySelectorAll(".mini-foto").forEach((m) => m.classList.remove("activa"));
+    miniaturaEl.classList.add("activa");
+  }
+
+  function tarjetaAuto(a, idx) {
+    const fotos = (a.fotos && a.fotos.length) ? a.fotos : (a.foto ? [a.foto] : []);
+    const cardId = `card-${idx}`;
+    const fotoPrincipal = fotos.length
+      ? `<img id="${cardId}-main" src="${fotos[0]}" alt="${a.marca} ${a.modelo}" loading="lazy" />`
       : `<div class="sin-foto">Sin foto</div>`;
+    const miniaturas = fotos.length > 1
+      ? `<div class="mini-fotos">${fotos.map((f, i) => `<img src="${f}" class="mini-foto${i === 0 ? " activa" : ""}" onclick="cambiarFotoPrincipal(event, '${cardId}', '${f}', this)" />`).join("")}</div>`
+      : "";
     return `
       <article class="auto-card">
         <div class="foto-wrap">
-          ${foto}
+          ${fotoPrincipal}
           <span class="badge-nuevo">${a.anio || ""}</span>
         </div>
+        ${miniaturas}
         <div class="info">
           <div class="marca-modelo">${a.marca} ${a.modelo}</div>
           <div class="precio">${fmtMXN(a.precio)}</div>
@@ -142,7 +157,7 @@
       contador.textContent = "0 unidades";
       return;
     }
-    grid.innerHTML = lista.map(tarjetaAuto).join("");
+    grid.innerHTML = lista.map((a, idx) => tarjetaAuto(a, idx)).join("");
     contador.textContent = `${lista.length} ${lista.length === 1 ? "unidad" : "unidades"}`;
   }
 

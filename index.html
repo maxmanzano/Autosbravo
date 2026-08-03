@@ -167,8 +167,9 @@
   const fmtMXN = (n) => "$" + Number(n).toLocaleString("es-MX");
 
   function tarjetaAuto(a) {
-    const foto = a.foto
-      ? `<img src="${a.foto}" alt="${a.marca} ${a.modelo}" loading="lazy" />`
+    const fotos = (a.fotos && a.fotos.length) ? a.fotos : (a.foto ? [a.foto] : []);
+    const foto = fotos.length
+      ? `<img src="${fotos[0]}" alt="${a.marca} ${a.modelo}" loading="lazy" />`
       : `<div class="sin-foto">Sin foto</div>`;
     return `
       <a href="catalogo.html" class="auto-card">
