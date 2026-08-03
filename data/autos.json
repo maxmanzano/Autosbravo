@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "marca": "MG",
+    "modelo": "5",
+    "anio": 2023,
+    "precio": 169900,
+    "kilometraje": 127000,
+    "color": "Gris Oxford ",
+    "descripcion": "MG5 Excite 2023\n\nMarca: MG\nModelo: MG5 Excite\nAño: 2023\nMotor: 1.5 L\nTransmisión: Manual\nColor: Gris Oxford, interiores negros",
+    "id": "auto-1785797958091",
+    "fotos": [
+      "fotos/1785797949053-jp9yh-WhatsApp_Image_2026-08-03_at_16.35.08.jpeg",
+      "fotos/1785797950103-h6u04-WhatsApp_Image_2026-08-03_at_16.31.43.jpeg",
+      "fotos/1785797951066-ky4y7-WhatsApp_Image_2026-08-03_at_16.35.07.jpeg",
+      "fotos/1785797951821-gyla8-WhatsApp_Image_2026-08-03_at_16.35.08__1_.jpeg",
+      "fotos/1785797952665-ggllc-WhatsApp_Image_2026-08-03_at_16.35.08__2_.jpeg",
+      "fotos/1785797953434-ninhi-ChatGPT_Image_Jul_31__2026__06_49_42_PM.png",
+      "fotos/1785797954744-s6g4g-WhatsApp_Image_2026-08-03_at_16.3.18.jpeg",
+      "fotos/1785797955586-xcrmh-WhatsApp_Image_2026-08-03_at_16.37.24.jpeg",
+      "fotos/1785797956384-dtx1o-WhatsApp_Image_2026-08-03_at_16.38.1.jpeg",
+      "fotos/1785797957178-qvtbi-WhatsApp_Image_2026-08-03_at_16.38.18.jpeg"
+    ],
+    "foto": "fotos/1785797949053-jp9yh-WhatsApp_Image_2026-08-03_at_16.35.08.jpeg",
+    "disponible": true
+  }
+]
