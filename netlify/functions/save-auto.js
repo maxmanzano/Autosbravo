@@ -11,7 +11,9 @@ exports.handler = async (event, context) => {
   try {
     const user = requireUser(context);
     const payload = JSON.parse(event.body);
-    const { auto, photoBase64, photoFilename } = payload;
+    // auto.fotos = arreglo de rutas ya existentes (tras quitar las que el usuario borró)
+    // photosNuevas = arreglo de { data (base64), filename } de fotos nuevas a subir
+    const { auto, photosNuevas } = payload;
 
     if (!auto || !auto.marca || !auto.modelo || !auto.precio) {
       return {
@@ -20,18 +22,26 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // 1. Si viene una foto nueva, la subimos primero a /fotos
-    let fotoPath = auto.foto || null;
-    if (photoBase64 && photoFilename) {
-      fotoPath = `fotos/${Date.now()}-${photoFilename.replace(/[^a-zA-Z0-9.\-_]/g, "_")}`;
-      await putFile(
-        fotoPath,
-        photoBase64,
-        `Agrega foto ${fotoPath} (por ${user.email})`,
-        null,
-        true // es base64 (imagen)
-      );
+    // 1. Subimos cada foto nueva a /fotos y juntamos las rutas
+    const fotosExistentes = Array.isArray(auto.fotos) ? auto.fotos : (auto.foto ? [auto.foto] : []);
+    const fotosSubidas = [];
+
+    if (Array.isArray(photosNuevas)) {
+      for (const foto of photosNuevas) {
+        if (!foto || !foto.data || !foto.filename) continue;
+        const rutaFoto = `fotos/${Date.now()}-${Math.random().toString(36).slice(2, 7)}-${foto.filename.replace(/[^a-zA-Z0-9.\-_]/g, "_")}`;
+        await putFile(
+          rutaFoto,
+          foto.data,
+          `Agrega foto ${rutaFoto} (por ${user.email})`,
+          null,
+          true // es base64 (imagen)
+        );
+        fotosSubidas.push(rutaFoto);
+      }
     }
+
+    const fotosFinal = [...fotosExistentes, ...fotosSubidas];
 
     // 2. Leemos el catálogo actual
     const current = await getFile(AUTOS_PATH);
@@ -40,19 +50,21 @@ exports.handler = async (event, context) => {
     // 3. Insertamos o actualizamos el auto
     const isEdit = Boolean(auto.id);
     let autoFinal;
+    const { fotos: _f, foto: _fo, ...autoSinFotos } = auto;
 
     if (isEdit) {
       const idx = autos.findIndex((a) => a.id === auto.id);
       if (idx === -1) {
         return { statusCode: 404, body: JSON.stringify({ error: "Auto no encontrado" }) };
       }
-      autoFinal = { ...autos[idx], ...auto, foto: fotoPath || autos[idx].foto };
+      autoFinal = { ...autos[idx], ...autoSinFotos, fotos: fotosFinal, foto: fotosFinal[0] || null };
       autos[idx] = autoFinal;
     } else {
       autoFinal = {
-        ...auto,
+        ...autoSinFotos,
         id: `auto-${Date.now()}`,
-        foto: fotoPath,
+        fotos: fotosFinal,
+        foto: fotosFinal[0] || null,
         disponible: auto.disponible !== false,
       };
       autos.push(autoFinal);
