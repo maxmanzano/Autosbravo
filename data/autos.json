@@ -1,14 +1,1 @@
-[
-  {
-    "marca": "Toyota",
-    "modelo": "Corolla",
-    "anio": 2022,
-    "precio": 285000,
-    "kilometraje": 45000,
-    "color": "Blanco",
-    "descripcion": "Auto de prueba",
-    "id": "auto-1785795063210",
-    "foto": "fotos/1785795061373-Captura_de_pantalla_2026-07-30_a_las_1.59.09_p.m..png",
-    "disponible": true
-  }
-]
+[]
