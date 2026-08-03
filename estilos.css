@@ -1,0 +1,626 @@
+/* ==========================================================================
+   AUTOS BRAVO — Design tokens (Brand System 1.0)
+   ========================================================================== */
+
+:root {
+  /* Paleta oficial */
+  --bravo-orange: #FE7901;
+  --carbon: #181817;
+  --white: #FFFFFF;
+  --warm-gray: #F4F3F0;
+  --road-gray: #6B6A68;
+
+  /* Derivados */
+  --carbon-soft: #26251f;
+  --orange-soft: #ffe6d1;
+  --line: rgba(24, 24, 23, 0.1);
+  --line-on-dark: rgba(255, 255, 255, 0.14);
+
+  /* Tipografía */
+  --f-display: "Inter", sans-serif;      /* titulares — usar 900 italic */
+  --f-body: "Inter", sans-serif;          /* cuerpo / UI */
+  --f-data: "Barlow Condensed", sans-serif; /* specs / datos compactos */
+
+  /* Espaciado */
+  --radius: 4px;
+  --container: 1180px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--f-body);
+  color: var(--carbon);
+  background: var(--white);
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; display: block; }
+
+a { color: inherit; text-decoration: none; }
+
+.wrap {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+}
+
+/* Enfoque visible de teclado, en toda la marca */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--bravo-orange);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}
+
+/* ==========================================================================
+   Eyebrow / etiquetas
+   ========================================================================== */
+.eyebrow {
+  font-family: var(--f-data);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: var(--bravo-orange);
+}
+
+.eyebrow--dark { color: var(--carbon); }
+.eyebrow--onDark { color: var(--bravo-orange); }
+
+.rule {
+  width: 46px;
+  height: 5px;
+  background: var(--bravo-orange);
+  border-radius: 2px;
+  margin: 0.9rem 0 1.4rem;
+}
+
+/* ==========================================================================
+   Logo (SVG + wordmark recreados del brandbook, sin assets externos)
+   ========================================================================== */
+.logo { display: inline-flex; align-items: center; gap: 0.6rem; }
+.logo svg { width: 34px; height: auto; flex-shrink: 0; }
+.logo-text { display: flex; flex-direction: column; line-height: 1; }
+.logo-text .nombre {
+  font-family: var(--f-display);
+  font-weight: 900;
+  font-style: normal;
+  letter-spacing: -0.01em;
+  font-size: 1.05rem;
+  color: var(--carbon);
+}
+.logo-text .tagline {
+  font-family: var(--f-data);
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  color: var(--bravo-orange);
+  margin-top: 0.15rem;
+}
+.logo--onDark .nombre { color: var(--white); }
+
+/* ==========================================================================
+   Header / navegación
+   ========================================================================== */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--line);
+}
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 76px;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nav-links a {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--carbon);
+}
+.nav-links a:hover { color: var(--bravo-orange); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--f-body);
+  font-weight: 700;
+  font-size: 0.92rem;
+  padding: 0.85rem 1.5rem;
+  border-radius: var(--radius);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn--primary { background: var(--bravo-orange); color: var(--white); }
+.btn--primary:hover { background: #e56c00; }
+.btn--dark { background: var(--carbon); color: var(--white); }
+.btn--dark:hover { background: #000; }
+.btn--outline { background: transparent; color: var(--carbon); border-color: var(--carbon); }
+.btn--outline:hover { background: var(--carbon); color: var(--white); }
+.btn--outline-light { background: transparent; color: var(--white); border-color: var(--line-on-dark); }
+.btn--outline-light:hover { background: var(--white); color: var(--carbon); }
+
+/* ==========================================================================
+   Hero
+   ========================================================================== */
+.hero {
+  position: relative;
+  background: var(--carbon);
+  color: var(--white);
+  overflow: hidden;
+  padding: clamp(3.5rem, 9vw, 7rem) 0 clamp(3rem, 7vw, 5rem);
+}
+.hero-shape {
+  position: absolute;
+  top: -12%;
+  right: -8%;
+  width: min(720px, 60vw);
+  opacity: 0.9;
+  pointer-events: none;
+}
+.hero-content { position: relative; z-index: 2; max-width: 760px; }
+.hero h1 {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  font-size: clamp(2.6rem, 6.4vw, 4.6rem);
+  line-height: 1.03;
+  margin: 0 0 1.3rem;
+}
+.hero h1 .accent { color: var(--bravo-orange); }
+.hero p.lede {
+  font-size: clamp(1.02rem, 1.6vw, 1.2rem);
+  color: rgba(255, 255, 255, 0.75);
+  max-width: 560px;
+  margin: 0 0 2.2rem;
+}
+.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+/* ==========================================================================
+   Certificado de calidad — pieza distintiva de marca
+   ========================================================================== */
+.certificado-section { background: var(--white); padding: clamp(3.5rem, 7vw, 6rem) 0; }
+.certificado-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+.certificado-copy h2 {
+  font-family: var(--f-body);
+  font-weight: 800;
+  font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+  letter-spacing: -0.01em;
+  margin: 0 0 1rem;
+}
+.certificado-copy p { color: var(--road-gray); font-size: 1.02rem; line-height: 1.6; margin: 0 0 1.6rem; max-width: 480px; }
+.stat-row { display: flex; gap: 2.5rem; margin-top: 1.8rem; }
+.stat-num {
+  font-family: var(--f-data);
+  font-weight: 800;
+  font-size: 2.6rem;
+  color: var(--bravo-orange);
+  line-height: 1;
+}
+.stat-label { font-size: 0.82rem; color: var(--road-gray); max-width: 130px; margin-top: 0.35rem; }
+
+.certificado-card {
+  background: var(--carbon);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px -20px rgba(24, 24, 23, 0.45);
+}
+.certificado-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.1rem 1.4rem;
+  background: #0f0f0e;
+}
+.certificado-head span:first-child {
+  font-family: var(--f-data);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+.badge-aprobado {
+  background: var(--bravo-orange);
+  color: var(--white);
+  font-family: var(--f-data);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+}
+.certificado-body { padding: 1.6rem 1.4rem 1.9rem; color: var(--white); }
+.certificado-body h3 { margin: 0 0 0.3rem; font-size: 1.15rem; font-weight: 800; }
+.certificado-id { font-family: var(--f-data); font-size: 0.78rem; color: var(--bravo-orange); letter-spacing: 0.05em; margin: 0 0 1.3rem; }
+.checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem 1.5rem; margin: 0 0 1.4rem; padding: 0; list-style: none; }
+.checklist li {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.9rem;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: tick-in 0.5s ease forwards;
+}
+.checklist li .ok {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--bravo-orange);
+  color: var(--carbon);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 900; flex-shrink: 0;
+}
+@keyframes tick-in { to { opacity: 1; transform: translateY(0); } }
+.certificado-result {
+  border-top: 1px solid var(--line-on-dark);
+  padding-top: 1.1rem;
+}
+.certificado-result .eyebrow { font-size: 0.7rem; }
+.certificado-result p {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 1.15rem;
+  margin: 0.3rem 0 0;
+}
+
+/* ==========================================================================
+   Tarjetas de auto (mismo lenguaje visual que sus templates de redes)
+   ========================================================================== */
+.destacados { background: var(--warm-gray); padding: clamp(3.5rem, 7vw, 6rem) 0; }
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1.5rem;
+  margin-bottom: 2.2rem;
+  flex-wrap: wrap;
+}
+.section-head h2 {
+  font-family: var(--f-body);
+  font-weight: 800;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  margin: 0.4rem 0 0;
+  letter-spacing: -0.01em;
+}
+
+.grid-autos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 1.4rem;
+}
+
+.auto-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  color: var(--carbon);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.auto-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 34px -18px rgba(24,24,23,0.28);
+  border-color: transparent;
+}
+.auto-card .foto-wrap {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--warm-gray);
+  overflow: hidden;
+}
+.auto-card .foto-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+.auto-card:hover .foto-wrap img { transform: scale(1.045); }
+.auto-card .foto-wrap .sin-foto {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--road-gray);
+  font-family: var(--f-data); text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.8rem;
+}
+.badge-nuevo {
+  position: absolute; top: 0.7rem; left: 0.7rem;
+  background: var(--carbon); color: var(--white);
+  font-family: var(--f-data); font-weight: 700; letter-spacing: 0.06em;
+  font-size: 0.68rem; text-transform: uppercase;
+  padding: 0.3rem 0.65rem; border-radius: 4px;
+}
+.badge-nuevo--orange { background: var(--bravo-orange); }
+.auto-card .info { padding: 1rem 1.1rem 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; flex-grow: 1; }
+.auto-card .marca-modelo {
+  font-family: var(--f-body);
+  font-weight: 700;
+  font-size: 1.02rem;
+  line-height: 1.25;
+  color: var(--carbon);
+}
+.auto-card .precio {
+  font-family: var(--f-data);
+  font-weight: 800;
+  font-size: 1.55rem;
+  color: var(--carbon);
+  margin-top: 0.1rem;
+}
+.auto-card .chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+.auto-card .chip {
+  font-family: var(--f-data);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--road-gray);
+  background: var(--warm-gray);
+  padding: 0.25rem 0.55rem;
+  border-radius: 4px;
+}
+.auto-card .desc {
+  font-size: 0.85rem;
+  color: var(--road-gray);
+  line-height: 1.4;
+  margin: 0.2rem 0 0;
+}
+.auto-card .ver-btn {
+  margin-top: auto;
+  padding-top: 0.8rem;
+  font-family: var(--f-body);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--bravo-orange);
+  display: flex; align-items: center; gap: 0.4rem;
+  border-top: 1px solid var(--line);
+  margin-top: 0.7rem;
+  padding-top: 0.7rem;
+}
+.auto-card .ver-btn:hover { color: var(--carbon); }
+
+/* ==========================================================================
+   Buscador en el hero (estilo marketplace)
+   ========================================================================== */
+.hero-buscador {
+  display: flex;
+  gap: 0.6rem;
+  background: var(--white);
+  padding: 0.5rem;
+  border-radius: 8px;
+  max-width: 560px;
+  margin: 0 0 1.6rem;
+  box-shadow: 0 20px 40px -20px rgba(0,0,0,0.5);
+}
+.hero-buscador input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 0.75rem 0.9rem;
+  font-family: var(--f-body);
+  font-size: 0.95rem;
+  color: var(--carbon);
+  background: transparent;
+}
+.hero-chips { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.hero-chips a {
+  font-family: var(--f-data);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.8);
+  border: 1px solid var(--line-on-dark);
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.hero-chips a:hover { background: var(--bravo-orange); border-color: var(--bravo-orange); color: var(--white); }
+
+/* ==========================================================================
+   Catálogo — layout con sidebar de filtros (estilo marketplace)
+   ========================================================================== */
+.catalogo-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 2.2rem;
+  align-items: start;
+}
+.filtros-sidebar {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1.4rem 1.3rem;
+  position: sticky;
+  top: 96px;
+}
+.filtro-grupo { margin-bottom: 1.5rem; }
+.filtro-grupo:last-child { margin-bottom: 0; }
+.filtro-grupo h4 {
+  font-family: var(--f-data);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  color: var(--carbon);
+  margin: 0 0 0.8rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--line);
+}
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.9rem;
+  padding: 0.3rem 0;
+  cursor: pointer;
+  color: var(--carbon);
+}
+.check-item input { accent-color: var(--bravo-orange); width: 16px; height: 16px; }
+.rango-inputs { display: flex; align-items: center; gap: 0.5rem; }
+.rango-inputs input {
+  width: 100%;
+  font-family: var(--f-body);
+  font-size: 0.85rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+.btn-limpiar {
+  width: 100%;
+  margin-top: 0.4rem;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--road-gray);
+  font-family: var(--f-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-limpiar:hover { border-color: var(--carbon); color: var(--carbon); }
+
+.catalogo-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+.catalogo-toolbar select {
+  font-family: var(--f-body);
+  font-size: 0.88rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--white);
+}
+.grid-autos--marketplace {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3.5rem 1.5rem;
+  background: var(--white);
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--road-gray);
+}
+.empty-state strong { display: block; color: var(--carbon); font-size: 1.05rem; margin-bottom: 0.4rem; }
+
+/* ==========================================================================
+   Cómo funciona
+   ========================================================================== */
+.proceso { padding: clamp(3.5rem, 7vw, 6rem) 0; background: var(--white); }
+.proceso-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 2.4rem;
+}
+.paso { border-top: 3px solid var(--carbon); padding-top: 1.2rem; }
+.paso .num { font-family: var(--f-data); font-weight: 800; color: var(--bravo-orange); font-size: 1.6rem; }
+.paso h3 { font-size: 1.05rem; margin: 0.5rem 0 0.5rem; }
+.paso p { color: var(--road-gray); font-size: 0.94rem; line-height: 1.55; margin: 0; }
+
+/* ==========================================================================
+   CTA final
+   ========================================================================== */
+.cta-final {
+  background: var(--bravo-orange);
+  color: var(--white);
+  padding: clamp(3rem, 6vw, 4.5rem) 0;
+  text-align: center;
+}
+.cta-final h2 {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  margin: 0 0 1.4rem;
+}
+.cta-final .btn--dark:hover { background: var(--white); color: var(--carbon); }
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.site-footer { background: var(--carbon); color: rgba(255,255,255,0.6); padding: 3rem 0 2rem; }
+.footer-top {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 1.5rem;
+  padding-bottom: 2rem; margin-bottom: 1.6rem;
+  border-bottom: 1px solid var(--line-on-dark);
+}
+.footer-nav { display: flex; gap: 1.6rem; list-style: none; margin: 0; padding: 0; flex-wrap: wrap; }
+.footer-nav a { font-size: 0.88rem; }
+.footer-nav a:hover { color: var(--white); }
+.footer-bottom { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem; font-size: 0.78rem; }
+
+/* ==========================================================================
+   Catálogo — filtros
+   ========================================================================== */
+.catalogo-header {
+  background: var(--carbon);
+  color: var(--white);
+  padding: clamp(2.4rem, 5vw, 3.4rem) 0 clamp(2rem, 4vw, 2.6rem);
+}
+.catalogo-header h1 {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(1.9rem, 4.2vw, 2.8rem);
+  margin: 0.4rem 0 0;
+}
+.catalogo-grid-section { padding: clamp(2rem, 5vw, 3rem) 0 clamp(3.5rem, 7vw, 5rem); background: var(--warm-gray); }
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 900px) {
+  .nav-links { display: none; }
+  .certificado-grid { grid-template-columns: 1fr; }
+  .proceso-grid { grid-template-columns: 1fr; gap: 1.6rem; }
+  .catalogo-layout { grid-template-columns: 1fr; }
+  .filtros-sidebar { position: static; }
+}

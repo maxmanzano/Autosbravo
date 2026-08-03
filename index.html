@@ -1,17 +1,229 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tu Agencia de Autos</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Autos Bravo — Tu siguiente nivel</title>
+<meta name="description" content="Seminuevos con una segunda vida. Cada unidad pasa por 120 puntos de revisión antes de llegar a ti." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700;1,800;1,900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
-  <h1>Próximamente: nuestro catálogo de autos</h1>
-  <p>Mientras se termina el diseño, puedes ver el <a href="catalogo.html">catálogo aquí</a>.</p>
 
-  <!-- NOTA para quien diseñe esta página:
-       El catálogo real vive en /data/autos.json y se actualiza
-       automáticamente desde /admin.html. No hay que tocar ese archivo
-       a mano, solo leerlo con fetch() como en catalogo.html -->
+<header class="site-header">
+  <div class="wrap">
+    <a href="index.html" class="logo" aria-label="Autos Bravo — inicio">
+      <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M2 48L14 30H38L26 48H2Z" fill="#FE7901"/>
+        <path d="M26 26L38 8H62L50 26H26Z" fill="#FE7901"/>
+        <path d="M50 26C50 21.5817 53.5817 18 58 18C62.4183 18 62 21.5817 62 26H50Z" fill="#FE7901"/>
+      </svg>
+      <span class="logo-text">
+        <span class="nombre">AUTOS BRAVO</span>
+        <span class="tagline">Tu siguiente nivel</span>
+      </span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="catalogo.html">Catálogo</a></li>
+      <li><a href="#certificado">Cómo evaluamos</a></li>
+      <li><a href="#proceso">Cómo comprar</a></li>
+    </ul>
+    <a href="catalogo.html" class="btn btn--primary">Ver catálogo</a>
+  </div>
+</header>
+
+<section class="hero">
+  <svg class="hero-shape" viewBox="0 0 500 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M40 400L160 220H340L220 400H40Z" fill="#FE7901" fill-opacity="0.14"/>
+    <path d="M220 190L340 10H500L380 190H220Z" fill="#FE7901" fill-opacity="0.2"/>
+  </svg>
+  <div class="wrap hero-content">
+    <p class="eyebrow eyebrow--onDark">Seminuevos revisados · Ciudad de México</p>
+    <h1>Un auto puede tener historia<br>y aún así ir a <span class="accent">tu siguiente nivel.</span></h1>
+    <p class="lede">En Autos Bravo, un seminuevo no es "un auto usado". Es un vehículo que ya demostró de qué es capaz y que, tras pasar por criterios estrictos de calidad, comienza una nueva etapa con plena confianza.</p>
+
+    <form class="hero-buscador" action="catalogo.html" method="get">
+      <input type="text" name="q" placeholder="Busca por marca, modelo o palabra clave" />
+      <button type="submit" class="btn btn--primary">Buscar</button>
+    </form>
+    <div class="hero-chips">
+      <a href="catalogo.html?marca=Toyota">Toyota</a>
+      <a href="catalogo.html?marca=Honda">Honda</a>
+      <a href="catalogo.html?marca=Mazda">Mazda</a>
+      <a href="catalogo.html?marca=Volkswagen">Volkswagen</a>
+      <a href="catalogo.html">Ver todos</a>
+    </div>
+
+    <div class="hero-actions">
+      <a href="catalogo.html" class="btn btn--primary">Ver catálogo completo</a>
+      <a href="#certificado" class="btn btn--outline-light">Cómo evaluamos cada unidad</a>
+    </div>
+  </div>
+</section>
+
+<section class="certificado-section" id="certificado">
+  <div class="wrap certificado-grid">
+    <div class="certificado-copy">
+      <p class="eyebrow">Segunda vida, no segunda categoría</p>
+      <h2>Cada unidad pasa por 120 puntos de revisión antes de tener tu nombre.</h2>
+      <p>Nuestro papel es quitar la incertidumbre del proceso de compra y convertirla en claridad, respaldo y emoción por avanzar. Mecánica, frenos, suspensión, sistema eléctrico, interiores y documentación — todo revisado, todo documentado.</p>
+      <div class="stat-row">
+        <div>
+          <div class="stat-num">120</div>
+          <div class="stat-label">puntos revisados por unidad</div>
+        </div>
+        <div>
+          <div class="stat-num">6</div>
+          <div class="stat-label">áreas certificadas antes de publicar</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="certificado-card">
+      <div class="certificado-head">
+        <span>Autos Bravo / Control de calidad</span>
+        <span class="badge-aprobado">Aprobado</span>
+      </div>
+      <div class="certificado-body">
+        <h3>Ejemplo de certificado</h3>
+        <p class="certificado-id">ID AB-0248</p>
+        <ul class="checklist" id="checklist">
+          <li style="animation-delay:.05s"><span class="ok">✓</span> Mecánica</li>
+          <li style="animation-delay:.15s"><span class="ok">✓</span> Frenos</li>
+          <li style="animation-delay:.25s"><span class="ok">✓</span> Suspensión</li>
+          <li style="animation-delay:.35s"><span class="ok">✓</span> Eléctrico</li>
+          <li style="animation-delay:.45s"><span class="ok">✓</span> Interiores</li>
+          <li style="animation-delay:.55s"><span class="ok">✓</span> Documentación</li>
+        </ul>
+        <div class="certificado-result">
+          <p class="eyebrow" style="font-size:.7rem;">Resultado</p>
+          <p>Unidad lista para su siguiente vida.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="destacados">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Recién llegados</p>
+        <h2>Lo último en entrar al lote</h2>
+      </div>
+      <a href="catalogo.html" class="btn btn--outline">Ver catálogo completo</a>
+    </div>
+    <div class="grid-autos" id="grid-destacados">
+      <!-- Se llena automáticamente desde data/autos.json -->
+    </div>
+  </div>
+</section>
+
+<section class="proceso" id="proceso">
+  <div class="wrap">
+    <p class="eyebrow">Cómo comprar</p>
+    <h2 style="font-family:var(--f-body);font-weight:800;font-size:clamp(1.6rem,3vw,2.2rem);margin:.4rem 0 0;">Tres pasos, sin vueltas</h2>
+    <div class="proceso-grid">
+      <div class="paso">
+        <div class="num">01</div>
+        <h3>Explora el catálogo</h3>
+        <p>Filtra por marca, precio o kilometraje y revisa la ficha completa de cada unidad, con fotos reales y su certificado de calidad.</p>
+      </div>
+      <div class="paso">
+        <div class="num">02</div>
+        <h3>Agenda tu visita</h3>
+        <p>Escríbenos por el formulario de la unidad que te interesa y coordinamos una cita para que la veas y la manejes.</p>
+      </div>
+      <div class="paso">
+        <div class="num">03</div>
+        <h3>Llévatelo con confianza</h3>
+        <p>Revisamos papeles, resolvemos dudas de financiamiento y te entregamos tu unidad lista para su siguiente vida.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-final">
+  <div class="wrap">
+    <h2>¿Listo para tu siguiente nivel?</h2>
+    <a href="catalogo.html" class="btn btn--dark">Ver catálogo completo</a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <a href="index.html" class="logo logo--onDark">
+        <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M2 48L14 30H38L26 48H2Z" fill="#FE7901"/>
+          <path d="M26 26L38 8H62L50 26H26Z" fill="#FE7901"/>
+          <path d="M50 26C50 21.5817 53.5817 18 58 18C62.4183 18 62 21.5817 62 26H50Z" fill="#FE7901"/>
+        </svg>
+        <span class="logo-text">
+          <span class="nombre">AUTOS BRAVO</span>
+          <span class="tagline">Tu siguiente nivel</span>
+        </span>
+      </a>
+      <ul class="footer-nav">
+        <li><a href="catalogo.html">Catálogo</a></li>
+        <li><a href="#certificado">Control de calidad</a></li>
+        <li><a href="#proceso">Cómo comprar</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Autos Bravo. Brand System 1.0.</span>
+      <span>Seminuevos con una segunda vida.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const fmtMXN = (n) => "$" + Number(n).toLocaleString("es-MX");
+
+  function tarjetaAuto(a) {
+    const foto = a.foto
+      ? `<img src="${a.foto}" alt="${a.marca} ${a.modelo}" loading="lazy" />`
+      : `<div class="sin-foto">Sin foto</div>`;
+    return `
+      <a href="catalogo.html" class="auto-card">
+        <div class="foto-wrap">
+          ${foto}
+          <span class="badge-nuevo badge-nuevo--orange">Nuevo ingreso</span>
+        </div>
+        <div class="info">
+          <div class="marca-modelo">${a.marca} ${a.modelo} ${a.anio || ""}</div>
+          <div class="precio">${fmtMXN(a.precio)}</div>
+          <div class="chips">
+            <span class="chip">${a.kilometraje ? a.kilometraje.toLocaleString("es-MX") + " km" : "S/D"}</span>
+            <span class="chip">${a.color || "S/D"}</span>
+          </div>
+          <span class="ver-btn">Ver ficha completa →</span>
+        </div>
+      </a>`;
+  }
+
+  fetch("data/autos.json?_=" + Date.now())
+    .then((r) => r.json())
+    .then((autos) => {
+      const disponibles = autos.filter((a) => a.disponible !== false);
+      const grid = document.getElementById("grid-destacados");
+      if (disponibles.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <strong>Aún no hay unidades publicadas.</strong>
+            Estamos preparando el próximo lote. Vuelve pronto o revisa el catálogo completo.
+          </div>`;
+        return;
+      }
+      grid.innerHTML = disponibles.slice(0, 3).map(tarjetaAuto).join("");
+    })
+    .catch(() => {
+      document.getElementById("grid-destacados").innerHTML =
+        `<div class="empty-state"><strong>No pudimos cargar el catálogo.</strong> Intenta recargar la página.</div>`;
+    });
+</script>
+
 </body>
 </html>

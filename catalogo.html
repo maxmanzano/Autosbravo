@@ -3,41 +3,241 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Catálogo de Autos</title>
-<style>
-  body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: #f4f6f9; margin: 0; padding: 2rem; }
-  h1 { text-align: center; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.2rem; max-width: 1100px; margin: 2rem auto; }
-  .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-  .card img { width: 100%; height: 180px; object-fit: cover; background: #ddd; }
-  .card-body { padding: 1rem; }
-  .precio { font-size: 1.2rem; font-weight: bold; color: #1a3c6e; }
-</style>
+<title>Catálogo — Autos Bravo</title>
+<meta name="description" content="Explora el catálogo de seminuevos de Autos Bravo. Todas las unidades pasan por 120 puntos de revisión." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700;1,800;1,900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
-  <h1>Catálogo de Autos</h1>
-  <div class="grid" id="grid"></div>
 
-  <script>
-    fetch("/data/autos.json?_=" + Date.now())
-      .then((r) => r.json())
-      .then((autos) => {
-        const grid = document.getElementById("grid");
-        autos.filter(a => a.disponible !== false).forEach((a) => {
-          const div = document.createElement("div");
-          div.className = "card";
-          div.innerHTML = `
-            <img src="${a.foto || 'fotos/placeholder.jpg'}" alt="${a.marca} ${a.modelo}" />
-            <div class="card-body">
-              <h3>${a.marca} ${a.modelo} ${a.anio}</h3>
-              <p class="precio">$${Number(a.precio).toLocaleString("es-MX")}</p>
-              <p>${a.kilometraje ? a.kilometraje.toLocaleString() + " km" : ""} · ${a.color || ""}</p>
-              <p>${a.descripcion || ""}</p>
-            </div>
-          `;
-          grid.appendChild(div);
-        });
+<header class="site-header">
+  <div class="wrap">
+    <a href="index.html" class="logo" aria-label="Autos Bravo — inicio">
+      <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M2 48L14 30H38L26 48H2Z" fill="#FE7901"/>
+        <path d="M26 26L38 8H62L50 26H26Z" fill="#FE7901"/>
+        <path d="M50 26C50 21.5817 53.5817 18 58 18C62.4183 18 62 21.5817 62 26H50Z" fill="#FE7901"/>
+      </svg>
+      <span class="logo-text">
+        <span class="nombre">AUTOS BRAVO</span>
+        <span class="tagline">Tu siguiente nivel</span>
+      </span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="catalogo.html">Catálogo</a></li>
+      <li><a href="index.html#certificado">Cómo evaluamos</a></li>
+      <li><a href="index.html#proceso">Cómo comprar</a></li>
+    </ul>
+    <a href="index.html" class="btn btn--outline">Volver al inicio</a>
+  </div>
+</header>
+
+<section class="catalogo-header">
+  <div class="wrap">
+    <p class="eyebrow eyebrow--onDark">Catálogo completo</p>
+    <h1>Cada unidad, revisada y lista.</h1>
+  </div>
+</section>
+
+<section class="catalogo-grid-section">
+  <div class="wrap catalogo-layout">
+
+    <aside class="filtros-sidebar">
+      <div class="filtro-grupo">
+        <h4>Buscar</h4>
+        <input type="text" id="f-texto" placeholder="Marca o modelo..." style="width:100%;padding:.6rem .7rem;border:1px solid var(--line);border-radius:4px;font-family:var(--f-body);font-size:.88rem;" />
+      </div>
+
+      <div class="filtro-grupo">
+        <h4>Marca</h4>
+        <div id="f-marcas"><!-- checkboxes generados por JS --></div>
+      </div>
+
+      <div class="filtro-grupo">
+        <h4>Precio (MXN)</h4>
+        <div class="rango-inputs">
+          <input type="number" id="f-precio-min" placeholder="Mín" />
+          <span>–</span>
+          <input type="number" id="f-precio-max" placeholder="Máx" />
+        </div>
+      </div>
+
+      <div class="filtro-grupo">
+        <h4>Año</h4>
+        <div class="rango-inputs">
+          <input type="number" id="f-anio-min" placeholder="Desde" />
+          <span>–</span>
+          <input type="number" id="f-anio-max" placeholder="Hasta" />
+        </div>
+      </div>
+
+      <button class="btn-limpiar" id="btn-limpiar">Limpiar filtros</button>
+    </aside>
+
+    <div>
+      <div class="catalogo-toolbar">
+        <span class="contador" id="contador"></span>
+        <select id="f-orden">
+          <option value="reciente">Más recientes</option>
+          <option value="precio-asc">Precio: menor a mayor</option>
+          <option value="precio-desc">Precio: mayor a menor</option>
+          <option value="km-asc">Menor kilometraje</option>
+        </select>
+      </div>
+      <div class="grid-autos grid-autos--marketplace" id="grid-catalogo"></div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <a href="index.html" class="logo logo--onDark">
+        <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M2 48L14 30H38L26 48H2Z" fill="#FE7901"/>
+          <path d="M26 26L38 8H62L50 26H26Z" fill="#FE7901"/>
+          <path d="M50 26C50 21.5817 53.5817 18 58 18C62.4183 18 62 21.5817 62 26H50Z" fill="#FE7901"/>
+        </svg>
+        <span class="logo-text">
+          <span class="nombre">AUTOS BRAVO</span>
+          <span class="tagline">Tu siguiente nivel</span>
+        </span>
+      </a>
+      <ul class="footer-nav">
+        <li><a href="catalogo.html">Catálogo</a></li>
+        <li><a href="index.html#certificado">Control de calidad</a></li>
+        <li><a href="index.html#proceso">Cómo comprar</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Autos Bravo. Brand System 1.0.</span>
+      <span>Seminuevos con una segunda vida.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const fmtMXN = (n) => "$" + Number(n).toLocaleString("es-MX");
+  let TODOS = [];
+
+  function tarjetaAuto(a) {
+    const foto = a.foto
+      ? `<img src="${a.foto}" alt="${a.marca} ${a.modelo}" loading="lazy" />`
+      : `<div class="sin-foto">Sin foto</div>`;
+    return `
+      <article class="auto-card">
+        <div class="foto-wrap">
+          ${foto}
+          <span class="badge-nuevo">${a.anio || ""}</span>
+        </div>
+        <div class="info">
+          <div class="marca-modelo">${a.marca} ${a.modelo}</div>
+          <div class="precio">${fmtMXN(a.precio)}</div>
+          <div class="chips">
+            <span class="chip">${a.kilometraje ? a.kilometraje.toLocaleString("es-MX") + " km" : "S/D"}</span>
+            <span class="chip">${a.color || "S/D"}</span>
+          </div>
+          <p class="desc">${a.descripcion || ""}</p>
+          <span class="ver-btn">Ver ficha completa →</span>
+        </div>
+      </article>`;
+  }
+
+  function pintar(lista) {
+    const grid = document.getElementById("grid-catalogo");
+    const contador = document.getElementById("contador");
+    if (lista.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <strong>No encontramos autos con esos filtros.</strong>
+          Prueba quitando algún filtro o vuelve más tarde — el catálogo se actualiza seguido.
+        </div>`;
+      contador.textContent = "0 unidades";
+      return;
+    }
+    grid.innerHTML = lista.map(tarjetaAuto).join("");
+    contador.textContent = `${lista.length} ${lista.length === 1 ? "unidad" : "unidades"}`;
+  }
+
+  function marcasSeleccionadas() {
+    return [...document.querySelectorAll("#f-marcas input:checked")].map((el) => el.value);
+  }
+
+  function aplicarFiltros() {
+    const texto = document.getElementById("f-texto").value.trim().toLowerCase();
+    const marcas = marcasSeleccionadas();
+    const precioMin = parseFloat(document.getElementById("f-precio-min").value) || null;
+    const precioMax = parseFloat(document.getElementById("f-precio-max").value) || null;
+    const anioMin = parseFloat(document.getElementById("f-anio-min").value) || null;
+    const anioMax = parseFloat(document.getElementById("f-anio-max").value) || null;
+    const orden = document.getElementById("f-orden").value;
+
+    let lista = TODOS.filter((a) => a.disponible !== false);
+
+    if (texto) {
+      lista = lista.filter((a) =>
+        `${a.marca} ${a.modelo}`.toLowerCase().includes(texto)
+      );
+    }
+    if (marcas.length > 0) lista = lista.filter((a) => marcas.includes(a.marca));
+    if (precioMin !== null) lista = lista.filter((a) => a.precio >= precioMin);
+    if (precioMax !== null) lista = lista.filter((a) => a.precio <= precioMax);
+    if (anioMin !== null) lista = lista.filter((a) => (a.anio || 0) >= anioMin);
+    if (anioMax !== null) lista = lista.filter((a) => (a.anio || 0) <= anioMax);
+
+    if (orden === "precio-asc") lista.sort((a, b) => a.precio - b.precio);
+    else if (orden === "precio-desc") lista.sort((a, b) => b.precio - a.precio);
+    else if (orden === "km-asc") lista.sort((a, b) => (a.kilometraje || 0) - (b.kilometraje || 0));
+
+    pintar(lista);
+  }
+
+  function limpiarFiltros() {
+    document.getElementById("f-texto").value = "";
+    document.getElementById("f-precio-min").value = "";
+    document.getElementById("f-precio-max").value = "";
+    document.getElementById("f-anio-min").value = "";
+    document.getElementById("f-anio-max").value = "";
+    document.querySelectorAll("#f-marcas input").forEach((el) => (el.checked = false));
+    aplicarFiltros();
+  }
+
+  ["f-texto", "f-precio-min", "f-precio-max", "f-anio-min", "f-anio-max"].forEach((id) => {
+    document.getElementById(id).addEventListener("input", aplicarFiltros);
+  });
+  document.getElementById("f-orden").addEventListener("change", aplicarFiltros);
+  document.getElementById("btn-limpiar").addEventListener("click", limpiarFiltros);
+
+  fetch("data/autos.json?_=" + Date.now())
+    .then((r) => r.json())
+    .then((autos) => {
+      TODOS = autos;
+      const marcas = [...new Set(autos.map((a) => a.marca))].sort();
+      const cont = document.getElementById("f-marcas");
+
+      const params = new URLSearchParams(window.location.search);
+      const marcaUrl = params.get("marca");
+      const qUrl = params.get("q");
+      if (qUrl) document.getElementById("f-texto").value = qUrl;
+
+      marcas.forEach((m) => {
+        const id = "marca-" + m.replace(/\s+/g, "-");
+        const label = document.createElement("label");
+        label.className = "check-item";
+        label.innerHTML = `<input type="checkbox" value="${m}" id="${id}" ${m === marcaUrl ? "checked" : ""}/> ${m}`;
+        cont.appendChild(label);
       });
-  </script>
+
+      aplicarFiltros();
+    })
+    .catch(() => {
+      document.getElementById("grid-catalogo").innerHTML =
+        `<div class="empty-state"><strong>No pudimos cargar el catálogo.</strong> Intenta recargar la página.</div>`;
+    });
+</script>
+
 </body>
 </html>
