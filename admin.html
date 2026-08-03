@@ -170,9 +170,12 @@
     if (user) cargarAutos();
   }
 
-  function tokenActual() {
+  // Usamos user.jwt() en vez de user.token.access_token: jwt() revisa si el
+  // token ya expiró (duran ~1 hora) y lo refresca solo antes de devolverlo.
+  async function tokenActual() {
     const user = netlifyIdentity.currentUser();
-    return user ? user.token.access_token : null;
+    if (!user) return null;
+    return await user.jwt();
   }
 
   async function cargarAutos() {
@@ -257,11 +260,12 @@
     };
 
     try {
+      const token = await tokenActual();
       const res = await fetch("/api/save-auto", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenActual()}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ auto, photoBase64, photoFilename }),
       });
@@ -278,11 +282,12 @@
 
   async function eliminarAuto(id) {
     if (!confirm("¿Seguro que quieres eliminar este auto?")) return;
+    const token = await tokenActual();
     const res = await fetch("/api/delete-auto", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${tokenActual()}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ id }),
     });
@@ -303,11 +308,12 @@
     statusMsg.textContent = "Publicando en MercadoLibre...";
 
     try {
+      const token = await tokenActual();
       const res = await fetch("/api/publish-mercadolibre", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenActual()}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ auto: { ...a, foto_url_publica: fotoUrlPublica } }),
       });
@@ -315,11 +321,12 @@
       if (!res.ok) throw new Error(JSON.stringify(data.error));
 
       // Guardamos el ml_item_id en el auto para futuras actualizaciones
+      const token2 = await tokenActual();
       await fetch("/api/save-auto", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenActual()}`,
+          Authorization: `Bearer ${token2}`,
         },
         body: JSON.stringify({ auto: { ...a, id, ml_item_id: data.ml_item_id } }),
       });
