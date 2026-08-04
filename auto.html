@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ficha del auto — Autos Bravo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700;1,800;1,900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilos.css">
+<style>
+  .oculto { display: none; }
+  .ficha-wrap {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 2.5rem;
+    padding: clamp(2rem, 5vw, 3rem) 0 clamp(3rem, 7vw, 5rem);
+    align-items: start;
+  }
+  .volver-link {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.88rem; font-weight: 600; color: var(--road-gray);
+    margin-bottom: 1.2rem;
+  }
+  .volver-link:hover { color: var(--carbon); }
+  .galeria-principal {
+    aspect-ratio: 4/3; background: var(--warm-gray); border-radius: 10px;
+    overflow: hidden; margin-bottom: 0.8rem;
+  }
+  .galeria-principal img { width: 100%; height: 100%; object-fit: cover; }
+  .galeria-principal .sin-foto {
+    width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+    color: var(--road-gray); font-family: var(--f-data); text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .galeria-mini { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .galeria-mini img {
+    width: 76px; height: 58px; object-fit: cover; border-radius: 6px; cursor: pointer;
+    opacity: 0.6; border: 2px solid transparent; transition: opacity .15s, border-color .15s;
+  }
+  .galeria-mini img.activa { opacity: 1; border-color: var(--bravo-orange); }
+  .ficha-info h1 {
+    font-family: var(--f-body); font-weight: 800; font-size: clamp(1.6rem, 3vw, 2.1rem);
+    margin: 0 0 0.3rem;
+  }
+  .ficha-info .precio-grande {
+    font-family: var(--f-data); font-weight: 800; color: var(--bravo-orange);
+    font-size: clamp(1.8rem, 4vw, 2.4rem); margin: 0 0 1rem;
+  }
+  .specs-tabla { width: 100%; border-collapse: collapse; margin: 1.2rem 0; }
+  .specs-tabla td { padding: 0.6rem 0; border-bottom: 1px solid var(--line); font-size: 0.92rem; }
+  .specs-tabla td:first-child { color: var(--road-gray); width: 40%; }
+  .specs-tabla td:last-child { font-weight: 600; }
+  .ficha-desc { color: var(--carbon); line-height: 1.65; margin: 1rem 0 1.6rem; }
+  .contacto-box {
+    background: var(--warm-gray); border-radius: 10px; padding: 1.4rem 1.5rem;
+    margin-top: 1.2rem;
+  }
+  .contacto-box h3 { margin: 0 0 0.6rem; font-size: 1.05rem; }
+  .contacto-box p { color: var(--road-gray); font-size: 0.9rem; margin: 0 0 1rem; }
+  #estado-carga, #estado-error { padding: 4rem 0; text-align: center; color: var(--road-gray); }
+  @media (max-width: 900px) {
+    .ficha-wrap { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a href="index.html" class="logo" aria-label="Autos Bravo — inicio">
+      <img src="logo.png" alt="Autos Bravo — Tu siguiente nivel" class="logo-img">
+    </a>
+    <ul class="nav-links">
+      <li><a href="catalogo.html">Catálogo</a></li>
+      <li><a href="index.html#certificado">Cómo evaluamos</a></li>
+      <li><a href="index.html#proceso">Cómo comprar</a></li>
+    </ul>
+    <a href="catalogo.html" class="btn btn--outline">Volver al catálogo</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <p id="estado-carga">Cargando ficha del auto...</p>
+  <p id="estado-error" class="oculto">No encontramos este auto. <a href="catalogo.html" style="color:var(--bravo-orange);">Vuelve al catálogo</a>.</p>
+
+  <div id="ficha-content" class="oculto">
+    <a href="catalogo.html" class="volver-link">← Volver al catálogo</a>
+
+    <div class="ficha-wrap">
+      <div>
+        <div class="galeria-principal" id="galeria-principal"></div>
+        <div class="galeria-mini" id="galeria-mini"></div>
+      </div>
+
+      <div class="ficha-info">
+        <h1 id="f-titulo"></h1>
+        <div class="precio-grande" id="f-precio"></div>
+
+        <table class="specs-tabla">
+          <tr><td>Año</td><td id="f-anio"></td></tr>
+          <tr><td>Kilometraje</td><td id="f-km"></td></tr>
+          <tr><td>Color</td><td id="f-color"></td></tr>
+        </table>
+
+        <p class="ficha-desc" id="f-desc"></p>
+
+        <div class="contacto-box">
+          <h3>¿Te interesa esta unidad?</h3>
+          <p>Escríbenos y coordinamos una cita para que la veas y la manejes.</p>
+          <a id="f-contacto-btn" href="#" class="btn btn--primary" style="width:100%;">Solicitar información</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <a href="index.html" class="logo logo--onDark">
+        <img src="logo-light.png" alt="Autos Bravo — Tu siguiente nivel" class="logo-img">
+      </a>
+      <ul class="footer-nav">
+        <li><a href="catalogo.html">Catálogo</a></li>
+        <li><a href="index.html#certificado">Control de calidad</a></li>
+        <li><a href="index.html#proceso">Cómo comprar</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Autos Bravo. Brand System 1.0.</span>
+      <span>Seminuevos con una segunda vida.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const fmtMXN = (n) => "$" + Number(n).toLocaleString("es-MX");
+
+  function cambiarFotoGrande(src, thumbEl) {
+    document.getElementById("galeria-principal").innerHTML = `<img src="${src}" alt="Foto del auto" />`;
+    document.querySelectorAll(".galeria-mini img").forEach((el) => el.classList.remove("activa"));
+    thumbEl.classList.add("activa");
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+
+  fetch("data/autos.json?_=" + Date.now())
+    .then((r) => r.json())
+    .then((autos) => {
+      const a = autos.find((x) => x.id === id);
+      document.getElementById("estado-carga").classList.add("oculto");
+
+      if (!a) {
+        document.getElementById("estado-error").classList.remove("oculto");
+        return;
+      }
+
+      const fotos = (a.fotos && a.fotos.length) ? a.fotos : (a.foto ? [a.foto] : []);
+
+      document.getElementById("galeria-principal").innerHTML = fotos.length
+        ? `<img src="${fotos[0]}" alt="${a.marca} ${a.modelo}" />`
+        : `<div class="sin-foto">Sin foto disponible</div>`;
+
+      const miniCont = document.getElementById("galeria-mini");
+      if (fotos.length > 1) {
+        miniCont.innerHTML = fotos
+          .map((f, i) => `<img src="${f}" class="${i === 0 ? "activa" : ""}" onclick="cambiarFotoGrande('${f}', this)" />`)
+          .join("");
+      }
+
+      document.title = `${a.marca} ${a.modelo} ${a.anio} — Autos Bravo`;
+      document.getElementById("f-titulo").textContent = `${a.marca} ${a.modelo} ${a.anio || ""}`;
+      document.getElementById("f-precio").textContent = fmtMXN(a.precio);
+      document.getElementById("f-anio").textContent = a.anio || "N/D";
+      document.getElementById("f-km").textContent = a.kilometraje ? a.kilometraje.toLocaleString("es-MX") + " km" : "N/D";
+      document.getElementById("f-color").textContent = a.color || "N/D";
+      document.getElementById("f-desc").textContent = a.descripcion || "Sin descripción adicional.";
+
+      const asunto = encodeURIComponent(`Info sobre ${a.marca} ${a.modelo} ${a.anio}`);
+      const cuerpo = encodeURIComponent(`Hola, me interesa el ${a.marca} ${a.modelo} ${a.anio} (ID ${a.id}) publicado en $${a.precio}. ¿Podrían darme más información?`);
+      document.getElementById("f-contacto-btn").href = `mailto:contacto@autosbravo.mx?subject=${asunto}&body=${cuerpo}`;
+
+      document.getElementById("ficha-content").classList.remove("oculto");
+    })
+    .catch(() => {
+      document.getElementById("estado-carga").classList.add("oculto");
+      document.getElementById("estado-error").classList.remove("oculto");
+    });
+</script>
+
+</body>
+</html>

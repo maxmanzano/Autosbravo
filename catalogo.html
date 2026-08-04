@@ -126,7 +126,7 @@
       ? `<div class="mini-fotos">${fotos.map((f, i) => `<img src="${f}" class="mini-foto${i === 0 ? " activa" : ""}" onclick="cambiarFotoPrincipal(event, '${cardId}', '${f}', this)" />`).join("")}</div>`
       : "";
     return `
-      <article class="auto-card">
+      <a href="auto.html?id=${a.id}" class="auto-card">
         <div class="foto-wrap">
           ${fotoPrincipal}
           <span class="badge-nuevo">${a.anio || ""}</span>
@@ -142,7 +142,7 @@
           <p class="desc">${a.descripcion || ""}</p>
           <span class="ver-btn">Ver ficha completa →</span>
         </div>
-      </article>`;
+      </a>`;
   }
 
   function pintar(lista) {

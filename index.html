@@ -172,7 +172,7 @@
       ? `<img src="${fotos[0]}" alt="${a.marca} ${a.modelo}" loading="lazy" />`
       : `<div class="sin-foto">Sin foto</div>`;
     return `
-      <a href="catalogo.html" class="auto-card">
+      <a href="auto.html?id=${a.id}" class="auto-card">
         <div class="foto-wrap">
           ${foto}
           <span class="badge-nuevo badge-nuevo--orange">Nuevo ingreso</span>
