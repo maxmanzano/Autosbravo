@@ -107,7 +107,7 @@
         <div class="contacto-box">
           <h3>¿Te interesa esta unidad?</h3>
           <p>Escríbenos y coordinamos una cita para que la veas y la manejes.</p>
-          <a id="f-contacto-btn" href="#" class="btn btn--primary" style="width:100%;">Solicitar información</a>
+          <a id="f-contacto-btn" href="#" class="btn btn--primary" style="width:100%;">Solicitar información por WhatsApp</a>
         </div>
       </div>
     </div>
@@ -177,9 +177,10 @@
       document.getElementById("f-color").textContent = a.color || "N/D";
       document.getElementById("f-desc").textContent = a.descripcion || "Sin descripción adicional.";
 
-      const asunto = encodeURIComponent(`Info sobre ${a.marca} ${a.modelo} ${a.anio}`);
-      const cuerpo = encodeURIComponent(`Hola, me interesa el ${a.marca} ${a.modelo} ${a.anio} (ID ${a.id}) publicado en $${a.precio}. ¿Podrían darme más información?`);
-      document.getElementById("f-contacto-btn").href = `mailto:contacto@autosbravo.mx?subject=${asunto}&body=${cuerpo}`;
+      const WHATSAPP_NUMERO = "525549560229";
+      const mensaje = encodeURIComponent(`Hola, me interesa el ${a.marca} ${a.modelo} ${a.anio} (ID ${a.id}) publicado en $${a.precio.toLocaleString("es-MX")}. ¿Podrían darme más información?`);
+      document.getElementById("f-contacto-btn").href = `https://wa.me/${WHATSAPP_NUMERO}?text=${mensaje}`;
+      document.getElementById("f-contacto-btn").target = "_blank";
 
       document.getElementById("ficha-content").classList.remove("oculto");
     })
