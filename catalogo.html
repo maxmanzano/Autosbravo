@@ -50,18 +50,18 @@
       <div class="filtro-grupo">
         <h4>Precio (MXN)</h4>
         <div class="rango-inputs">
-          <input type="number" id="f-precio-min" placeholder="Mín" />
+          <input type="number" id="f-precio-min" placeholder="Mín" min="0" step="1000" />
           <span>–</span>
-          <input type="number" id="f-precio-max" placeholder="Máx" />
+          <input type="number" id="f-precio-max" placeholder="Máx" min="0" step="1000" />
         </div>
       </div>
 
       <div class="filtro-grupo">
         <h4>Año</h4>
         <div class="rango-inputs">
-          <input type="number" id="f-anio-min" placeholder="Desde" />
+          <select id="f-anio-min"><option value="">Desde</option></select>
           <span>–</span>
-          <input type="number" id="f-anio-max" placeholder="Hasta" />
+          <select id="f-anio-max"><option value="">Hasta</option></select>
         </div>
       </div>
 
@@ -204,11 +204,25 @@
     aplicarFiltros();
   }
 
-  ["f-texto", "f-precio-min", "f-precio-max", "f-anio-min", "f-anio-max"].forEach((id) => {
+  ["f-texto", "f-precio-min", "f-precio-max"].forEach((id) => {
     document.getElementById(id).addEventListener("input", aplicarFiltros);
+  });
+  ["f-anio-min", "f-anio-max"].forEach((id) => {
+    document.getElementById(id).addEventListener("change", aplicarFiltros);
   });
   document.getElementById("f-orden").addEventListener("change", aplicarFiltros);
   document.getElementById("btn-limpiar").addEventListener("click", limpiarFiltros);
+
+  // Llenamos los selects de año con un rango fijo (año actual + 1, hacia atrás)
+  (function poblarAnios() {
+    const anioActual = new Date().getFullYear();
+    const selMin = document.getElementById("f-anio-min");
+    const selMax = document.getElementById("f-anio-max");
+    for (let y = anioActual + 1; y >= 1990; y--) {
+      selMin.insertAdjacentHTML("beforeend", `<option value="${y}">${y}</option>`);
+      selMax.insertAdjacentHTML("beforeend", `<option value="${y}">${y}</option>`);
+    }
+  })();
 
   fetch("data/autos.json?_=" + Date.now())
     .then((r) => r.json())

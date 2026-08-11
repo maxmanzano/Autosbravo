@@ -23,10 +23,19 @@
     margin-bottom: 1.2rem;
   }
   .volver-link:hover { color: var(--carbon); }
-  .galeria-principal {
-    aspect-ratio: 4/3; background: var(--warm-gray); border-radius: 10px;
-    overflow: hidden; margin-bottom: 0.8rem;
+  .galeria-principal-wrap { position: relative; margin-bottom: 0.8rem; }
+  .galeria-principal { aspect-ratio: 4/3; background: var(--warm-gray); border-radius: 10px; overflow: hidden; margin-bottom: 0; }
+  .galeria-nav-btn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(24,24,23,0.55); color: white; border: none;
+    font-size: 1.3rem; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s ease;
   }
+  .galeria-nav-btn:hover { background: rgba(24,24,23,0.85); }
+  .galeria-nav-btn.prev { left: 12px; }
+  .galeria-nav-btn.next { right: 12px; }
   .galeria-principal img { width: 100%; height: 100%; object-fit: cover; }
   .galeria-principal .sin-foto {
     width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
@@ -88,7 +97,11 @@
 
     <div class="ficha-wrap">
       <div>
-        <div class="galeria-principal" id="galeria-principal"></div>
+        <div class="galeria-principal-wrap">
+          <div class="galeria-principal" id="galeria-principal"></div>
+          <button type="button" class="galeria-nav-btn prev oculto" id="galeria-prev" aria-label="Foto anterior">‹</button>
+          <button type="button" class="galeria-nav-btn next oculto" id="galeria-next" aria-label="Foto siguiente">›</button>
+        </div>
         <div class="galeria-mini" id="galeria-mini"></div>
       </div>
 
@@ -135,12 +148,26 @@
 
 <script>
   const fmtMXN = (n) => "$" + Number(n).toLocaleString("es-MX");
+  let fotosActuales = [];
+  let indiceActual = 0;
 
-  function cambiarFotoGrande(src, thumbEl) {
-    document.getElementById("galeria-principal").innerHTML = `<img src="${src}" alt="Foto del auto" />`;
-    document.querySelectorAll(".galeria-mini img").forEach((el) => el.classList.remove("activa"));
-    thumbEl.classList.add("activa");
+  function mostrarFoto(i) {
+    if (fotosActuales.length === 0) return;
+    indiceActual = (i + fotosActuales.length) % fotosActuales.length; // circular
+    document.getElementById("galeria-principal").innerHTML =
+      `<img src="${fotosActuales[indiceActual]}" alt="Foto del auto" />`;
+    document.querySelectorAll(".galeria-mini img").forEach((el, idx) => {
+      el.classList.toggle("activa", idx === indiceActual);
+    });
   }
+
+  document.getElementById("galeria-prev").addEventListener("click", () => mostrarFoto(indiceActual - 1));
+  document.getElementById("galeria-next").addEventListener("click", () => mostrarFoto(indiceActual + 1));
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") mostrarFoto(indiceActual - 1);
+    if (e.key === "ArrowRight") mostrarFoto(indiceActual + 1);
+  });
 
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
@@ -156,16 +183,18 @@
         return;
       }
 
-      const fotos = (a.fotos && a.fotos.length) ? a.fotos : (a.foto ? [a.foto] : []);
+      fotosActuales = (a.fotos && a.fotos.length) ? a.fotos : (a.foto ? [a.foto] : []);
 
-      document.getElementById("galeria-principal").innerHTML = fotos.length
-        ? `<img src="${fotos[0]}" alt="${a.marca} ${a.modelo}" />`
+      document.getElementById("galeria-principal").innerHTML = fotosActuales.length
+        ? `<img src="${fotosActuales[0]}" alt="${a.marca} ${a.modelo}" />`
         : `<div class="sin-foto">Sin foto disponible</div>`;
 
       const miniCont = document.getElementById("galeria-mini");
-      if (fotos.length > 1) {
-        miniCont.innerHTML = fotos
-          .map((f, i) => `<img src="${f}" class="${i === 0 ? "activa" : ""}" onclick="cambiarFotoGrande('${f}', this)" />`)
+      if (fotosActuales.length > 1) {
+        document.getElementById("galeria-prev").classList.remove("oculto");
+        document.getElementById("galeria-next").classList.remove("oculto");
+        miniCont.innerHTML = fotosActuales
+          .map((f, i) => `<img src="${f}" class="${i === 0 ? "activa" : ""}" onclick="mostrarFoto(${i})" />`)
           .join("");
       }
 
