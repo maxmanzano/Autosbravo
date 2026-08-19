@@ -22,5 +22,20 @@
     ],
     "foto": "fotos/1785797949053-jp9yh-WhatsApp_Image_2026-08-03_at_16.35.08.jpeg",
     "disponible": true
+  },
+  {
+    "marca": "JAC",
+    "modelo": "JAC2 Smart",
+    "anio": 2025,
+    "precio": 199000,
+    "kilometraje": 48000,
+    "color": "Rojo",
+    "descripcion": "JAC2 Smart 2025\nMotor: 1.5 L, 4 cilindros\nTransmisión: Manual, 5 velocidades\nCarrocería: 4 puertas",
+    "id": "auto-1787161317615",
+    "fotos": [
+      "fotos/1787161316267-5b45q-94fdea16-d65a-4aff-82f7-aa60ba0f9c48.JPG"
+    ],
+    "foto": "fotos/1787161316267-5b45q-94fdea16-d65a-4aff-82f7-aa60ba0f9c48.JPG",
+    "disponible": true
   }
 ]
