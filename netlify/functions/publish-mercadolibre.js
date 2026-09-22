@@ -1,6 +1,16 @@
-const { requireUser } = require("./utils/auth");
+const { verificarToken, tokenDesdeHeader } = require("./utils/adminAuth");
 
 const ML_API = "https://api.mercadolibre.com";
+
+function requireUser(event) {
+  const payload = verificarToken(tokenDesdeHeader(event));
+  if (!payload) {
+    const err = new Error("No autorizado. Inicia sesión en el panel.");
+    err.statusCode = 401;
+    throw err;
+  }
+  return payload;
+}
 
 // Los access tokens de MercadoLibre expiran cada 6 horas, así que en cada
 // llamada pedimos uno nuevo usando el refresh_token (que sí es de larga duración).
@@ -35,17 +45,14 @@ async function getAccessToken() {
   return data.access_token;
 }
 
-// Traduce nuestro objeto "auto" al formato que espera el endpoint /items de MercadoLibre.
-// OJO: los campos de category_id y attribute IDs dependen del sitio (MLM, MCO, etc.)
-// y deben ajustarse según la categoría real de vehículos usados de tu país.
 function buildMercadoLibreItem(auto) {
   return {
     title: `${auto.marca} ${auto.modelo} ${auto.anio}`.slice(0, 60),
-    category_id: process.env.ML_CATEGORY_ID_AUTOS, // ej. MLM1744 para "Autos y Camionetas" en México
+    category_id: process.env.ML_CATEGORY_ID_AUTOS,
     price: auto.precio,
     currency_id: process.env.ML_CURRENCY_ID || "MXN",
     available_quantity: 1,
-    buying_mode: "classified", // los vehículos usados se publican como "clasificados"
+    buying_mode: "classified",
     condition: "used",
     listing_type_id: process.env.ML_LISTING_TYPE || "gold",
     pictures: auto.foto_url_publica ? [{ source: auto.foto_url_publica }] : [],
@@ -58,13 +65,13 @@ function buildMercadoLibreItem(auto) {
   };
 }
 
-exports.handler = async (event, context) => {
+exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method not allowed" };
   }
 
   try {
-    requireUser(context);
+    requireUser(event);
     const { auto } = JSON.parse(event.body);
 
     if (!auto.foto_url_publica) {

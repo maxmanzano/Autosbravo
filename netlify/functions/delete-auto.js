@@ -1,15 +1,25 @@
 const { getFile, putFile } = require("./utils/github");
-const { requireUser } = require("./utils/auth");
+const { verificarToken, tokenDesdeHeader } = require("./utils/adminAuth");
 
 const AUTOS_PATH = "data/autos.json";
 
-exports.handler = async (event, context) => {
+function requireUser(event) {
+  const payload = verificarToken(tokenDesdeHeader(event));
+  if (!payload) {
+    const err = new Error("No autorizado. Inicia sesión en el panel.");
+    err.statusCode = 401;
+    throw err;
+  }
+  return payload;
+}
+
+exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method not allowed" };
   }
 
   try {
-    const user = requireUser(context);
+    const user = requireUser(event);
     const { id } = JSON.parse(event.body);
     if (!id) {
       return { statusCode: 400, body: JSON.stringify({ error: "Falta el id del auto" }) };
