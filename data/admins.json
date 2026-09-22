@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "id": "admin-1790111862586",
+    "email": "m.manzano@neo-stat.com",
+    "passwordHash": "af9710712229b372f2b52c6856cd5d9c:859f686ddd8b8cf1700ceae6b9738b1f6280a857ae7a5f3ec72cecf40950c384fdef8ccb36d71ed7f2e006e277e4156b6c30873608a63c53453ab8cbb485412d",
+    "role": "owner",
+    "activo": true,
+    "creadoEn": "2026-09-22T21:17:42.808Z"
+  }
+]
