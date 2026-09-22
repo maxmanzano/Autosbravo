@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Panel de Administración — Catálogo de Autos</title>
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <style>
   :root {
     --primario: #1a3c6e;
@@ -28,6 +27,7 @@
     align-items: center;
   }
   header h1 { font-size: 1.2rem; margin: 0; }
+  #sesion-info { font-size: .85rem; opacity: .85; margin-right: 1rem; }
   #login-screen {
     display: flex;
     flex-direction: column;
@@ -35,6 +35,15 @@
     justify-content: center;
     height: 70vh;
     gap: 1rem;
+  }
+  #login-screen .caja {
+    background: white; padding: 2rem; border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1); width: 100%; max-width: 360px;
+  }
+  #login-screen label { display: block; font-size: .85rem; margin: .8rem 0 .3rem; }
+  #login-screen input {
+    width: 100%; padding: .6rem .7rem; border: 1px solid #d1d5db;
+    border-radius: 6px; font-size: .95rem;
   }
   button {
     background: var(--acento);
@@ -64,7 +73,7 @@
     gap: 1rem;
   }
   .grid-form label { display: flex; flex-direction: column; font-size: 0.85rem; gap: 0.3rem; }
-  input, textarea {
+  input, textarea, select {
     padding: 0.6rem;
     border: 1px solid #d1d5db;
     border-radius: 6px;
@@ -80,9 +89,10 @@
     background: #dbeafe;
     color: #1e40af;
   }
+  .badge.gris { background: #e5e7eb; color: #374151; }
   .acciones button { margin-right: 0.4rem; padding: 0.4rem 0.8rem; font-size: 0.8rem; }
   #status-msg { font-size: 0.9rem; margin-top: 0.5rem; }
-  .oculto { display: none; }
+  .oculto { display: none !important; }
   .thumb {
     position: relative;
     width: 84px; height: 84px;
@@ -104,17 +114,56 @@
 
 <header>
   <h1>🚗 Panel de Administración — Catálogo de Autos</h1>
-  <div id="user-info" class="oculto">
-    <button class="secundario" onclick="netlifyIdentity.logout()">Cerrar sesión</button>
+  <div id="user-info" class="oculto" style="display:flex;align-items:center;">
+    <span id="sesion-info"></span>
+    <button class="secundario" onclick="cerrarSesion()">Cerrar sesión</button>
   </div>
 </header>
 
 <div id="login-screen">
-  <p>Necesitas iniciar sesión para administrar el catálogo.</p>
-  <button onclick="netlifyIdentity.open()">Iniciar sesión</button>
+  <div class="caja">
+    <h2 style="margin-top:0;font-size:1.1rem;">Iniciar sesión</h2>
+    <form id="form-login">
+      <label>Correo</label>
+      <input type="email" id="login-email" required />
+      <label>Contraseña</label>
+      <input type="password" id="login-password" required />
+      <button type="submit" style="width:100%;margin-top:1.2rem;">Iniciar sesión</button>
+    </form>
+    <p id="login-msg" style="color:#b91c1c;font-size:.85rem;margin-bottom:0;"></p>
+  </div>
 </div>
 
 <main id="admin-content" class="oculto">
+
+  <div class="panel" id="panel-administradores">
+    <h2>Administradores</h2>
+    <p style="color:#6b7280;font-size:.88rem;">Da de alta a quien necesites que cargue autos — se crea con correo y contraseña directo aquí, sin depender de ningún correo de invitación.</p>
+
+    <form id="form-nuevo-admin" class="grid-form" style="margin-bottom:1.2rem;">
+      <label>Correo
+        <input type="email" id="na-email" required />
+      </label>
+      <label>Contraseña (mín. 8 caracteres, con un número)
+        <input type="password" id="na-password" minlength="8" required />
+      </label>
+      <label>Rol
+        <select id="na-role">
+          <option value="operador">Operador (solo carga autos)</option>
+          <option value="owner">Owner (también gestiona administradores)</option>
+        </select>
+      </label>
+      <div class="full">
+        <button type="submit">Crear administrador</button>
+      </div>
+    </form>
+    <p id="admin-status-msg" style="font-size:.88rem;"></p>
+
+    <table>
+      <thead><tr><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody id="tabla-admins"></tbody>
+    </table>
+  </div>
 
   <div class="panel">
     <h2 id="form-titulo">Agregar nuevo auto</h2>
@@ -174,37 +223,155 @@
 </main>
 
 <script>
+  // ==========================================================================
+  // Sesión: guardamos el token propio (no Netlify Identity) en localStorage
+  // ==========================================================================
+  let sesionInfo = null;
+
+  function cargarSesionGuardada() {
+    const token = localStorage.getItem("ab_token");
+    const info = localStorage.getItem("ab_info");
+    if (token && info) {
+      sesionInfo = JSON.parse(info);
+      mostrarSegunSesion(true);
+    } else {
+      mostrarSegunSesion(false);
+    }
+  }
+
+  function mostrarSegunSesion(logueado) {
+    document.getElementById("login-screen").classList.toggle("oculto", logueado);
+    document.getElementById("admin-content").classList.toggle("oculto", !logueado);
+    document.getElementById("user-info").classList.toggle("oculto", !logueado);
+    document.getElementById("panel-administradores").classList.toggle("oculto", !logueado || (sesionInfo && sesionInfo.role !== "owner"));
+    if (logueado) {
+      document.getElementById("sesion-info").textContent = `${sesionInfo.email} (${sesionInfo.role})`;
+      cargarAutos();
+      if (sesionInfo.role === "owner") cargarAdmins();
+    }
+  }
+
+  function tokenActual() {
+    return localStorage.getItem("ab_token");
+  }
+
+  function cerrarSesion() {
+    localStorage.removeItem("ab_token");
+    localStorage.removeItem("ab_info");
+    sesionInfo = null;
+    mostrarSegunSesion(false);
+  }
+
+  document.getElementById("form-login").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById("login-msg");
+    msg.textContent = "";
+    try {
+      const res = await fetch("/api/admin-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: document.getElementById("login-email").value,
+          password: document.getElementById("login-password").value,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error desconocido");
+
+      localStorage.setItem("ab_token", data.token);
+      localStorage.setItem("ab_info", JSON.stringify(data.info));
+      sesionInfo = data.info;
+      mostrarSegunSesion(true);
+    } catch (err) {
+      msg.textContent = "❌ " + err.message;
+    }
+  });
+
+  cargarSesionGuardada();
+
+  // ==========================================================================
+  // Módulo Administradores (solo owner)
+  // ==========================================================================
+  async function cargarAdmins() {
+    const res = await fetch("/api/admin-listar", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${tokenActual()}` },
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const tbody = document.getElementById("tabla-admins");
+    tbody.innerHTML = data.admins
+      .map(
+        (a) => `
+        <tr>
+          <td>${a.email}</td>
+          <td><span class="badge">${a.role}</span></td>
+          <td><span class="badge ${a.activo === false ? "gris" : ""}">${a.activo === false ? "Deshabilitado" : "Activo"}</span></td>
+          <td class="acciones">
+            <button onclick="resetearPasswordAdmin('${a.id}')">Resetear contraseña</button>
+            <button onclick="cambiarEstadoAdmin('${a.id}', ${a.activo === false})">${a.activo === false ? "Habilitar" : "Deshabilitar"}</button>
+          </td>
+        </tr>`
+      )
+      .join("");
+  }
+
+  document.getElementById("form-nuevo-admin").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById("admin-status-msg");
+    msg.textContent = "Creando...";
+    try {
+      const res = await fetch("/api/admin-crear", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${tokenActual()}` },
+        body: JSON.stringify({
+          email: document.getElementById("na-email").value,
+          password: document.getElementById("na-password").value,
+          role: document.getElementById("na-role").value,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error desconocido");
+      msg.textContent = "✅ Administrador creado.";
+      document.getElementById("form-nuevo-admin").reset();
+      cargarAdmins();
+    } catch (err) {
+      msg.textContent = "❌ " + err.message;
+    }
+  });
+
+  async function resetearPasswordAdmin(id) {
+    const nueva = prompt("Nueva contraseña (mínimo 8 caracteres, con un número):");
+    if (!nueva) return;
+    const res = await fetch("/api/admin-resetear", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${tokenActual()}` },
+      body: JSON.stringify({ id, password: nueva }),
+    });
+    const data = await res.json();
+    if (!res.ok) return alert("Error: " + data.error);
+    alert("Contraseña actualizada.");
+  }
+
+  async function cambiarEstadoAdmin(id, activo) {
+    const res = await fetch("/api/admin-estado", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${tokenActual()}` },
+      body: JSON.stringify({ id, activo }),
+    });
+    const data = await res.json();
+    if (!res.ok) return alert("Error: " + data.error);
+    cargarAdmins();
+  }
+
+  // ==========================================================================
+  // Catálogo de autos (igual que antes, con multi-fotos)
+  // ==========================================================================
   let autosCache = [];
-  let fotosExistentesActuales = []; // rutas (strings) del auto que se está editando
-  let fotosNuevasSeleccionadas = []; // Files elegidos en esta sesión de edición
-
-  netlifyIdentity.on("init", (user) => {
-    mostrarSegunSesion(user);
-  });
-  netlifyIdentity.on("login", (user) => {
-    mostrarSegunSesion(user);
-    netlifyIdentity.close();
-  });
-  netlifyIdentity.on("logout", () => mostrarSegunSesion(null));
-  netlifyIdentity.init();
-
-  function mostrarSegunSesion(user) {
-    document.getElementById("login-screen").classList.toggle("oculto", !!user);
-    document.getElementById("admin-content").classList.toggle("oculto", !user);
-    document.getElementById("user-info").classList.toggle("oculto", !user);
-    if (user) cargarAutos();
-  }
-
-  // Usamos user.jwt() en vez de user.token.access_token: jwt() revisa si el
-  // token ya expiró (duran ~1 hora) y lo refresca solo antes de devolverlo.
-  async function tokenActual() {
-    const user = netlifyIdentity.currentUser();
-    if (!user) return null;
-    return await user.jwt();
-  }
+  let fotosExistentesActuales = [];
+  let fotosNuevasSeleccionadas = [];
 
   async function cargarAutos() {
-    // El catálogo público (autos.json) se lee directo del repo publicado, sin auth.
     const res = await fetch("/data/autos.json?_=" + Date.now());
     autosCache = await res.json();
     pintarTabla();
@@ -281,7 +448,7 @@
 
   document.getElementById("foto").addEventListener("change", (e) => {
     fotosNuevasSeleccionadas = fotosNuevasSeleccionadas.concat(Array.from(e.target.files));
-    e.target.value = ""; // permite volver a elegir más fotos después sin perder las ya elegidas
+    e.target.value = "";
     pintarFotosNuevasPreview();
   });
 
@@ -319,7 +486,7 @@
   function leerFotoComoBase64(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => resolve(reader.result.split(",")[1]); // sin el prefijo data:
+      reader.onload = () => resolve(reader.result.split(",")[1]);
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
@@ -349,12 +516,11 @@
     };
 
     try {
-      const token = await tokenActual();
       const res = await fetch("/api/save-auto", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${tokenActual()}`,
         },
         body: JSON.stringify({ auto, photosNuevas: fotosNuevasBase64 }),
       });
@@ -371,12 +537,11 @@
 
   async function eliminarAuto(id) {
     if (!confirm("¿Seguro que quieres eliminar este auto?")) return;
-    const token = await tokenActual();
     const res = await fetch("/api/delete-auto", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${tokenActual()}`,
       },
       body: JSON.stringify({ id }),
     });
@@ -391,32 +556,27 @@
     const primeraFoto = (a.fotos && a.fotos[0]) || a.foto;
     if (!primeraFoto) return alert("Este auto no tiene fotos todavía. Agrega al menos una foto antes de publicar.");
 
-    // La foto ya publicada en tu sitio (GitHub Pages/Netlify) tiene una URL pública real
     const fotoUrlPublica = `${window.location.origin}/${primeraFoto}`;
-
     const statusMsg = document.getElementById("status-msg");
     statusMsg.textContent = "Publicando en MercadoLibre...";
 
     try {
-      const token = await tokenActual();
       const res = await fetch("/api/publish-mercadolibre", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${tokenActual()}`,
         },
         body: JSON.stringify({ auto: { ...a, foto_url_publica: fotoUrlPublica } }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(JSON.stringify(data.error));
 
-      // Guardamos el ml_item_id en el auto para futuras actualizaciones
-      const token2 = await tokenActual();
       await fetch("/api/save-auto", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token2}`,
+          Authorization: `Bearer ${tokenActual()}`,
         },
         body: JSON.stringify({ auto: { ...a, id, ml_item_id: data.ml_item_id } }),
       });
