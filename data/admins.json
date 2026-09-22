@@ -15,5 +15,14 @@
     "activo": true,
     "creadoEn": "2026-09-22T21:19:20.529Z",
     "creadoPor": "m.manzano@neo-stat.com"
+  },
+  {
+    "id": "admin-1790112341616",
+    "email": "marian@neo-stat.com",
+    "passwordHash": "6023779c4e5b9c5f64735dfe7703d913:c94b73dedb2ec98955f127a2339ba91d6af6a9369b2121dbabca8cdf23af05a101d3acdb98d8945125c1372f5a219c0ec48a0384da0e985d5e90010719ba1740",
+    "role": "operador",
+    "activo": true,
+    "creadoEn": "2026-09-22T21:25:41.853Z",
+    "creadoPor": "m.manzano@neo-stat.com"
   }
 ]
