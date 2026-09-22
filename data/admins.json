@@ -6,5 +6,14 @@
     "role": "owner",
     "activo": true,
     "creadoEn": "2026-09-22T21:17:42.808Z"
+  },
+  {
+    "id": "admin-1790111960292",
+    "email": "miguel.sandoval@neo-stat.com",
+    "passwordHash": "b2a482c3cf686e01e0c0045e1d4bd821:eb128a87eb9e2fedf75b6282e4bc939f66f4824265761e4d47bc3642ba9fee78d458d53cc64232d095226a2c3d3c6e43ed2a5be081adda164e045fa4afbc46b3",
+    "role": "owner",
+    "activo": true,
+    "creadoEn": "2026-09-22T21:19:20.529Z",
+    "creadoPor": "m.manzano@neo-stat.com"
   }
 ]
