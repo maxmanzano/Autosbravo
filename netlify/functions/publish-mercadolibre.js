@@ -54,7 +54,7 @@ function buildMercadoLibreItem(auto) {
     available_quantity: 1,
     buying_mode: "classified",
     condition: "used",
-    listing_type_id: process.env.ML_LISTING_TYPE || "free",
+    listing_type_id: process.env.ML_LISTING_TYPE || "silver",
     pictures: auto.foto_url_publica ? [{ source: auto.foto_url_publica }] : [],
     location: {
       country: { name: process.env.ML_LOCATION_COUNTRY || "México" },
