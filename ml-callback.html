@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Conectar MercadoLibre — Autos Bravo</title>
+<style>
+  body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: #f4f6f9; margin: 0; }
+  .wrap { max-width: 520px; margin: 3rem auto; background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+  h1 { font-size: 1.15rem; margin: 0 0 1rem; }
+  p { color: #374151; font-size: .92rem; line-height: 1.5; }
+  .campo { margin: 1.2rem 0; }
+  .campo label { display: block; font-size: .8rem; color: #6b7280; margin-bottom: .3rem; }
+  .valor { display: flex; gap: .5rem; }
+  .valor input { flex: 1; padding: .6rem .7rem; border: 1px solid #d1d5db; border-radius: 6px; font-family: monospace; font-size: .85rem; }
+  .valor button { padding: .6rem 1rem; border: none; border-radius: 6px; background: #1a3c6e; color: white; cursor: pointer; font-size: .85rem; }
+  .ok { color: #15803d; }
+  .error { color: #b91c1c; }
+  .aviso { background: #fff7ed; border: 1px solid #fed7aa; padding: 1rem; border-radius: 8px; font-size: .85rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="titulo">Conectando con MercadoLibre...</h1>
+  <p id="estado">Un momento, estamos intercambiando el código de autorización.</p>
+
+  <div id="resultado" style="display:none;">
+    <p class="ok">✅ Conexión exitosa. Copia este valor y guárdalo como variable de entorno en Netlify:</p>
+    <div class="campo">
+      <label>ML_REFRESH_TOKEN</label>
+      <div class="valor">
+        <input type="text" id="refresh-token" readonly />
+        <button onclick="copiar()">Copiar</button>
+      </div>
+    </div>
+    <div class="aviso">
+      Ve a Netlify → Environment variables → agrega <code>ML_REFRESH_TOKEN</code> con este valor (márcalo como "secret"), guarda y haz un redeploy. Con eso, el botón "Publicar en ML" del panel ya podrá funcionar.
+    </div>
+  </div>
+
+  <p id="error-msg" class="error" style="display:none;"></p>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+  const redirectUri = window.location.origin + window.location.pathname;
+
+  async function intercambiar() {
+    if (!code) {
+      document.getElementById("titulo").textContent = "Falta el código de autorización";
+      document.getElementById("estado").textContent =
+        "Esta página debe abrirse a través del link de autorización de MercadoLibre, no directamente.";
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/ml-exchange-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, redirectUri }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(JSON.stringify(data.error));
+
+      document.getElementById("titulo").textContent = "¡Listo!";
+      document.getElementById("estado").textContent = "";
+      document.getElementById("refresh-token").value = data.refresh_token;
+      document.getElementById("resultado").style.display = "block";
+    } catch (err) {
+      document.getElementById("titulo").textContent = "Error al conectar";
+      document.getElementById("error-msg").style.display = "block";
+      document.getElementById("error-msg").textContent = "❌ " + err.message;
+    }
+  }
+
+  function copiar() {
+    const input = document.getElementById("refresh-token");
+    input.select();
+    navigator.clipboard.writeText(input.value);
+    alert("Copiado al portapapeles.");
+  }
+
+  intercambiar();
+</script>
+</body>
+</html>
