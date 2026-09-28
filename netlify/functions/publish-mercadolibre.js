@@ -60,7 +60,7 @@ function buildMercadoLibreItem(auto) {
       { id: "BRAND", value_name: auto.marca },
       { id: "MODEL", value_name: auto.modelo },
       { id: "VEHICLE_YEAR", value_name: String(auto.anio) },
-      { id: "KILOMETERS", value_name: String(auto.kilometraje) },
+      { id: "KILOMETERS", value_name: `${auto.kilometraje} km` },
     ],
   };
 }
