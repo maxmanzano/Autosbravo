@@ -56,11 +56,19 @@ function buildMercadoLibreItem(auto) {
     condition: "used",
     listing_type_id: process.env.ML_LISTING_TYPE || "gold",
     pictures: auto.foto_url_publica ? [{ source: auto.foto_url_publica }] : [],
+    location: {
+      country: { name: process.env.ML_LOCATION_COUNTRY || "México" },
+      state: { name: process.env.ML_LOCATION_STATE || "Ciudad de México" },
+      city: { name: process.env.ML_LOCATION_CITY || "Ciudad de México" },
+    },
     attributes: [
       { id: "BRAND", value_name: auto.marca },
       { id: "MODEL", value_name: auto.modelo },
       { id: "VEHICLE_YEAR", value_name: String(auto.anio) },
       { id: "KILOMETERS", value_name: `${auto.kilometraje} km` },
+      { id: "TRIM", value_name: auto.version || "S/D" },
+      { id: "FUEL_TYPE", value_name: auto.combustible || "Gasolina" },
+      { id: "DOORS", value_name: String(auto.puertas || "4") },
     ],
   };
 }
