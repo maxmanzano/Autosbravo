@@ -187,6 +187,25 @@
       <label>Color
         <input type="text" id="color" />
       </label>
+      <label>Versión / edición
+        <input type="text" id="version" placeholder="Ej. GLX, Sport, Advance..." />
+      </label>
+      <label>Combustible
+        <select id="combustible">
+          <option value="Gasolina">Gasolina</option>
+          <option value="Diésel">Diésel</option>
+          <option value="Híbrido">Híbrido</option>
+          <option value="Eléctrico">Eléctrico</option>
+        </select>
+      </label>
+      <label>Puertas
+        <select id="puertas">
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4" selected>4</option>
+          <option value="5">5</option>
+        </select>
+      </label>
       <label class="full">Descripción
         <textarea id="descripcion" rows="3"></textarea>
       </label>
@@ -463,6 +482,9 @@
     document.getElementById("precio").value = a.precio;
     document.getElementById("kilometraje").value = a.kilometraje || "";
     document.getElementById("color").value = a.color || "";
+    document.getElementById("version").value = a.version || "";
+    document.getElementById("combustible").value = a.combustible || "Gasolina";
+    document.getElementById("puertas").value = a.puertas || "4";
     document.getElementById("descripcion").value = a.descripcion || "";
 
     fotosExistentesActuales = a.fotos && a.fotos.length ? [...a.fotos] : (a.foto ? [a.foto] : []);
@@ -511,6 +533,9 @@
       precio: Number(document.getElementById("precio").value),
       kilometraje: Number(document.getElementById("kilometraje").value) || 0,
       color: document.getElementById("color").value,
+      version: document.getElementById("version").value,
+      combustible: document.getElementById("combustible").value,
+      puertas: document.getElementById("puertas").value,
       descripcion: document.getElementById("descripcion").value,
       fotos: fotosExistentesActuales,
     };
